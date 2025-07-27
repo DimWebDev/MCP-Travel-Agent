@@ -26,3 +26,6 @@ flake8 = "^6.0.0"
 safety = "^2.3.0"
 bandit = "^1.7.5"
 mypy = "^1.6.0"
+
+[tool.isort]
+profile = "black"
