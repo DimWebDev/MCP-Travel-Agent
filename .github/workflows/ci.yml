@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
@@ -34,12 +34,11 @@ jobs:
           path: .venv
           key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies
+      - name: Install dependencies & project
         run: |
-          poetry install --no-root --no-interaction
-          poetry run pip install "mcp[cli]"
+          poetry install --no-interaction
 
-      - name: Run Tests
+      - name: Run tests
         run: |
           poetry run pytest tests/ -v --cov=app --cov-report=term-missing
           poetry run python -c "import app.agent, app.mcp_servers; print('✅ Imports OK')"
