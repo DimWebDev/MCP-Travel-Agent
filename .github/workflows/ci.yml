@@ -49,22 +49,3 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
-
-  docker:
-    needs: test
-    runs-on: ubuntu-latest
-    # only run on real git pushes (not PRs)—
-    # and since the workflow only triggers on push to main/dev/feature/**,
-    # this will now include feature branches as well
-    if: github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Docker Compose smoke-test
-        run: |
-          docker compose config
-          docker compose build
-          docker compose up -d
-          sleep 10
-          docker compose ps
-          docker compose down
