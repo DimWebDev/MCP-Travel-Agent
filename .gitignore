@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Poetry
+poetry.lock
+
+# Environments
+.env
+.env.*
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Test/coverage
+htmlcov/
+.coverage
+.cache/
+
+# Build
+build/
+dist/
+*.log
+
+# Misc
+*.sqlite3
+*.db
+output.txt
