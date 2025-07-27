@@ -3,8 +3,8 @@ import time
 from typing import Any, List
 
 import httpx
-from pydantic import BaseModel
 from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel
 
 
 class RateLimiter:
