@@ -4,10 +4,10 @@
 Build an intelligent AI travel agent that uses Model Context Protoco**Technical Stack (Minimal Complexity)
 
 **Backend Framework:** FastMCP servers with MCP tool integration
-**AI Agent:** Claude-3.5 or GPT-4 via API with function calling
+**AI Agent:** GPT-4ο-mini via API with function calling
 **MCP Implementation:** Python MCP SDK for tool creation
 **Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
-**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (Claude/GPT-4) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
+**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (GPT-4o-mini) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
 
 ## 1. Objective and Scope  
 
