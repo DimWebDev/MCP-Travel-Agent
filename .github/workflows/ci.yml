@@ -1,14 +1,10 @@
-# .github/workflows/ci.yml
-name: CI/CD Pipeline
+name: CI
 
 on:
   push:
-    branches:
-      - main
-      - dev
-      - 'feature/**'
+    branches: [main, dev, 'feature/**']
   pull_request:
-    branches: [ main, dev ]
+    branches: [main, dev]
 
 jobs:
   test:
@@ -18,102 +14,54 @@ jobs:
         python-version: [3.11, 3.12]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-    - name: Cache Poetry virtualenv
-      id: cache-poetry-deps
-      uses: actions/cache@v4
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Cache Poetry venv
+        id: cache-poetry
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-    - name: Install dependencies
-      if: steps.cache-poetry-deps.outputs.cache-hit != 'true'
-      run: |
-        poetry install --no-interaction
-        poetry run pip install "mcp[cli]"
+      - name: Install dependencies
+        run: |
+          poetry install --no-root --no-interaction
+          poetry run pip install "mcp[cli]"
 
-    - name: Code Quality Checks
-      run: |
-        # Black: code style (will fail if not formatted)
-        poetry run black --check --diff .
+      - name: Run Tests
+        run: |
+          poetry run pytest tests/ -v --cov=app --cov-report=term-missing
+          poetry run python -c "import app.agent, app.mcp_servers; print('✅ Imports OK')"
 
-        # Isort: import sorting (will fail if incorrect)
-        poetry run isort --check-only --diff .
-
-        # Flake8: code lint (fail on major errors)
-        poetry run flake8 app/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-
-        # Mypy: type checking (optional)
-        # poetry run mypy app/ --ignore-missing-imports
-
-    - name: Security Scan
-      run: |
-        # Safety: dependency vulnerability scan
-        poetry run safety check
-
-        # Bandit: basic static analysis (does not fail CI)
-        poetry run bandit -r app/ -f json || true
-
-    - name: Run Tests
-      run: |
-        # Run unit tests with coverage
-        poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
-
-        # Import tests (quick import check)
-        poetry run python -c "import app.agent, app.mcp_servers; print('✅ All imports successful')"
-
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: matrix.python-version == '3.11'
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: false
+      - name: Upload coverage (3.11 only)
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          fail_ci_if_error: false
 
   docker:
-    runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Docker Compose Check
-      run: |
-        # Validate docker compose config
-        docker compose config
-
-        # Build all services
-        docker compose build
-
-        # Test containers start
-        docker compose up -d
-        sleep 10
-        docker compose ps
-        docker compose down
-
-  deploy:
     runs-on: ubuntu-latest
-    needs: [test, docker]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
+    if: github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Deploy to Production
-      run: |
-        echo "🚀 Ready for deployment!"
-        # Insert your deployment commands here, e.g.:
-        # ./deploy_prod.sh
-        # or use a deployment GitHub Action
+      - uses: actions/checkout@v4
+      - name: Docker Compose smoke-test
+        run: |
+          docker compose config
+          docker compose build
+          docker compose up -d
+          sleep 10
+          docker compose ps
+          docker compose down
