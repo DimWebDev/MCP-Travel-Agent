@@ -40,14 +40,14 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest tests/ -v --cov=app --cov-report=term-missing
+          poetry run pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=xml
           poetry run python -c "import app.agent, app.mcp_servers; print('✅ Imports OK')"
 
       - name: Upload coverage (3.11 only)
         if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v4
         with:
-          file: coverage.xml
+          file: ./coverage.xml
           fail_ci_if_error: false
 
   docker:
