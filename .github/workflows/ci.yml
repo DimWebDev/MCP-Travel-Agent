@@ -1,0 +1,121 @@
+# .github/workflows/ci.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feature/**'
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11, 3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: |
+        poetry install --no-interaction --no-root
+        poetry run pip install "mcp[cli]"
+
+    - name: Install project
+      run: poetry install --no-interaction
+
+    - name: Code Quality Checks
+      run: |
+        # Format check
+        poetry run black --check --diff .
+        
+        # Import sorting check
+        poetry run isort --check-only --diff .
+        
+        # Linting (exclude .venv and other non-source folders)
+        poetry run flake8 app/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        
+        # Type checking (if mypy is added later)
+        # poetry run mypy app/ --ignore-missing-imports
+
+    - name: Security Scan
+      run: |
+        # Check for security vulnerabilities
+        poetry run safety check
+        
+        # Check for secrets in code
+        poetry run bandit -r app/ -f json || true
+
+    - name: Run Tests
+      run: |
+        # Unit tests with coverage
+        poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
+        
+        # Import tests
+        poetry run python -c "import app.agent, app.mcp_servers; print('✅ All imports successful')"
+
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v4
+      if: matrix.python-version == '3.11'
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Docker Compose Check
+      run: |
+        # Validate docker-compose syntax
+        docker-compose config
+        
+        # Build all services
+        docker-compose build
+        
+        # Test containers start
+        docker-compose up -d
+        sleep 10
+        docker-compose ps
+        docker-compose down
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test, docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy to Production
+      run: |
+        echo "🚀 Ready for deployment!"
+        # Add your deployment steps here
+        # e.g., AWS, Heroku, DigitalOcean, etc.
