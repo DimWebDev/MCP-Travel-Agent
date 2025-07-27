@@ -6,14 +6,14 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T001: Set Up Project Structure and Poetry Environment
 
-- [ ] Initialize Git repository with `git init` and create .gitignore file
-- [ ] Create pyproject.toml with exact dependencies from Planning\#3 technical stack
-- [ ] Run `poetry install` and `poetry shell` to set up virtual environment
-- [ ] Create directory structure following Planning\#4 component architecture
-- [ ] Create .env.example with all environment variables from Planning\#5
-- [ ] Create empty __init__.py files in all Python packages
-- [ ] Verify setup with `poetry run python --version` and import tests
-- [ ] Document setup process in README.md (Planning\#8)
+- [x] Initialize Git repository with `git init` and create .gitignore file
+- [x] Create pyproject.toml with exact dependencies from Planning\#3 technical stack
+- [x] Run `poetry install` and `poetry shell` to set up virtual environment
+- [x] Create directory structure following Planning\#4 component architecture
+- [x] Create .env.example with all environment variables from Planning\#5
+- [x] Create empty __init__.py files in all Python packages
+- [x] Verify setup with `poetry run python --version` and import tests
+- [x] Document setup process in README.md (Planning\#8)
 
 
 ### Task T002: Create Geocoding MCP Server

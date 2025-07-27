@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "mcp-travel-agent"
+version = "0.1.0"
+description = "MCP-Orchestrated AI Travel Agent"
+authors = ["Your Name <your@email.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+mcp = {extras = ["cli"], version = "^1.12.2"}
+openai = "^1.3.0"
+httpx = "^0.27.0"
+pydantic = "^2.5.0"
+python-multipart = "^0.0.9"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+black = "^23.9.0"
+isort = "^5.12.0"
+mypy = "^1.6.0"
