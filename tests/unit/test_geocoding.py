@@ -6,7 +6,11 @@ import httpx
 import pytest
 
 from app.mcp_servers.geocoding import server
-from app.mcp_servers.geocoding.server import GeocodeRequest, GeocodeResponse, RateLimiter
+from app.mcp_servers.geocoding.server import (
+    GeocodeRequest,
+    GeocodeResponse,
+    RateLimiter,
+)
 
 
 class MockResponse(httpx.Response):
