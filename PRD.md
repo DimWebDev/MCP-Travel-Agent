@@ -1,7 +1,7 @@
 # Product Requirements Document: MCP-Orchestrated AI Travel Agent
 
 **Main Takeaway:**  
-Build an intelligent AI travel agent that uses Model Context Protoco**Technical Stack (Minimal Complexity)
+Build an intelligent AI travel agent that uses Model Context Protocol 
 
 **Backend Framework:** FastMCP servers with MCP tool integration
 **AI Agent:** GPT-4ο-mini via API with function calling
