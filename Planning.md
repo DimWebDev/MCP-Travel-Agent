@@ -92,22 +92,22 @@ MCP Travel Agent System
 │   ├── Response Synthesis → PRD: Dynamic Result Synthesis
 │   └── Conversation Memory Store → PRD: User Preference Memory
 │
-├── Geocoding MCP Server (Python)
+├── Geocoding FastMCP Server (Python)
 │   ├── OSM Nominatim Wrapper → PRD: geocode_tool
 │   ├── Location Resolution Logic
 │   └── Coordinate Validation & Caching
 │
-├── POI Discovery MCP Server (Python)
+├── POI Discovery FastMCP Server (Python)
 │   ├── Overpass API Wrapper → PRD: poi_search_tool
 │   ├── Category-based Search Logic
 │   └── Result Filtering & Ranking
 │
-├── Wikipedia MCP Server (Python)
+├── Wikipedia FastMCP Server (Python)
 │   ├── Wikipedia API Wrapper → PRD: wikipedia_lookup_tool
 │   ├── Content Extraction & Summarization
 │   └── Multi-language Support
 │
-└── Trivia MCP Server (Python)
+└── Trivia FastMCP Server (Python)
     ├── DuckDuckGo API Wrapper → PRD: trivia_search_tool
     ├── Fact Discovery & Context Matching
     └── Source Reliability Scoring
@@ -124,7 +124,7 @@ MCP Travel Agent System
 │  │   Component     │  │ State Store     │  │ Streaming       │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
-                                │ HTTP/SSE
+                                │ Streamable HTTP / SSE
                                 ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                 FastAPI Backend + GPT-4o-mini Agent            │
@@ -136,7 +136,7 @@ MCP Travel Agent System
                     ▼              ▼              ▼              ▼
             ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
             │  Geocoding   │ │ POI Discovery│ │  Wikipedia   │ │    Trivia    │
-            │ MCP Server   │ │ MCP Server   │ │ MCP Server   │ │ MCP Server   │
+            │FastMCP Server│ │FastMCP Server│ │FastMCP Server│ │FastMCP Server│
             │              │ │              │ │              │ │              │
             │ Nominatim    │ │ Overpass API │ │ Wikipedia    │ │ DuckDuckGo   │
             │ Integration  │ │ Integration  │ │ Integration  │ │ Integration  │
@@ -155,7 +155,7 @@ MCP Travel Agent System
 
 - **Frontend:** Vite build output served as static files or via CDN
 - **Backend:** FastAPI with uvicorn in Docker containers
-- **MCP Servers:** Individual Python containers with health checks
+- **MCP Servers:** Individual FastMCP containers with health checks
 - **Service Discovery:** Agent maintains registry of available MCP servers with load balancing
 - **Development Workflow:** Docker Compose with volume mounts for live code reloading
 
@@ -165,7 +165,7 @@ MCP Travel Agent System
 ```
 User Input → React Frontend → FastAPI Backend → GPT-4o-mini Agent Decision → 
 [Parallel/Sequential MCP Server Calls] → Response Synthesis → 
-Server-Sent Events → Real-time Frontend Updates
+Streamable HTTP (chunked) / SSE (fallback) → Real-time Frontend Updates
 ```
 
 
@@ -187,7 +187,7 @@ Server-Sent Events → Real-time Frontend Updates
 python = "^3.11"
 fastapi = "^0.104.0"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
-mcp = "^0.8.0"  # MCP SDK
+mcp = {version="^0.8.0", extras=["cli"]}  # MCP SDK with CLI tools
 openai = "^1.3.0"  # GPT-4o-mini integration
 httpx = "^0.25.0"  # Async HTTP client
 pydantic = "^2.5.0"  # Data validation
@@ -241,6 +241,8 @@ mypy = "^1.6.0"
 | **Learning Objective Scope Creep** | Timeline delays | High | Weekly sprint reviews, strict 80/20 adherence, feature freeze after Week 4 |
 | **Over-Engineering MCP Patterns** | Complexity without learning value | Medium | Focus on demonstrable patterns, avoid premature abstractions |
 | **Development Environment Setup** | Team onboarding delays | Low | Comprehensive Docker Compose setup, detailed README instructions |
+
+**Sprint 5 Enhancement - TODO: OAuth TokenVerifier stub** for future enhancement of MCP authentication patterns.
 
 ## 7. Planning Process \& Updates
 

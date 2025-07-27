@@ -20,6 +20,7 @@ cd mcp-travel-agent
 
 # 4. Install Python dependencies
 poetry install
+poetry run pip install "mcp[cli]"  # Add MCP CLI tools
 poetry shell
 
 # 5. Setup environment variables
@@ -58,11 +59,18 @@ cd frontend && npm run dev
 
 ### Option 2: Individual Services for Debugging
 ```bash
-# Start individual MCP servers for debugging
-poetry run python app/mcp_servers/geocoding/server.py
-poetry run python app/mcp_servers/poi_discovery/server.py
-poetry run python app/mcp_servers/wikipedia/server.py
-poetry run python app/mcp_servers/trivia/server.py
+# Start individual MCP servers for debugging (using FastMCP)
+uv run mcp dev app/mcp_servers/geocoding/server.py  # MCP Inspector
+python app/mcp_servers/geocoding/server.py          # Direct execution
+
+uv run mcp dev app/mcp_servers/poi_discovery/server.py
+python app/mcp_servers/poi_discovery/server.py
+
+uv run mcp dev app/mcp_servers/wikipedia/server.py  
+python app/mcp_servers/wikipedia/server.py
+
+uv run mcp dev app/mcp_servers/trivia/server.py
+python app/mcp_servers/trivia/server.py
 
 # Start agent orchestrator
 poetry run uvicorn app.agent.main:app --reload --host 0.0.0.0 --port 8000

@@ -22,7 +22,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Implement rate limiting (1 req/sec) as specified in Planning\#5 dependencies
 - [ ] Add GeocodeRequest and GeocodeResponse Pydantic models for validation
 - [ ] Implement error handling for timeouts, HTTP errors, and API failures
-- [ ] Create MCP tool decorator for `geocode_location` function
+- [ ] Annotate function with `@mcp.tool()` from FastMCP
 - [ ] Write unit tests with mocked HTTP responses in tests/unit/test_geocoding.py
 - [ ] Create Dockerfile for containerized deployment (Planning\#4)
 - [ ] Test server manually with sample location queries
@@ -35,7 +35,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Build Overpass QL query generator for different POI categories
 - [ ] Add result filtering and ranking logic based on distance and importance
 - [ ] Implement POISearchRequest and POIResult Pydantic models
-- [ ] Create MCP tool decorator for `search_pois` function
+- [ ] Annotate function with `@mcp.tool()` from FastMCP
 - [ ] Write comprehensive unit tests with mocked Overpass API responses
 - [ ] Create Dockerfile and test with sample coordinate queries
 
@@ -47,9 +47,11 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Add rate limiting (5000 req/hour) as specified in Planning\#5
 - [ ] Create WikipediaRequest and WikipediaResponse Pydantic models
 - [ ] Implement multi-language support detection for international POIs
-- [ ] Create MCP tool decorator for `get_wikipedia_info` function
+- [ ] Annotate function with `@mcp.tool()` from FastMCP
 - [ ] Write unit tests with mocked Wikipedia API responses
 - [ ] Create Dockerfile and test with sample POI name queries
+
+**T004-extra** – TODO: Expose `/resources/city-guides/{city}.md` using `@mcp.resource` for static city-guide blurbs
 
 
 ### Task T005: Create Trivia MCP Server
@@ -59,7 +61,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Add source reliability scoring and content filtering
 - [ ] Create TriviaRequest and TriviaResponse Pydantic models
 - [ ] Implement context matching for travel-relevant facts
-- [ ] Create MCP tool decorator for `get_trivia` function
+- [ ] Annotate function with `@mcp.tool()` from FastMCP
 - [ ] Write unit tests with mocked DuckDuckGo API responses
 - [ ] Create Dockerfile and test with sample topic queries
 
@@ -165,7 +167,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Set up Vite + React + TypeScript project following Planning\#3 frontend stack
 - [ ] Install and configure Tailwind CSS and Headless UI components
 - [ ] Create chat message components with proper TypeScript interfaces
-- [ ] Implement real-time messaging with Server-Sent Events from FastAPI
+- [ ] Implement streaming with **fetch() & ReadableStream over `/mcp` (Streamable HTTP)**; keep SSE adapter for legacy
 - [ ] Add conversation history display using Zustand state management
 - [ ] Create loading states, error boundaries, and user feedback mechanisms
 - [ ] Add responsive design for mobile and desktop viewports

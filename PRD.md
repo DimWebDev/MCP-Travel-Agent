@@ -1,7 +1,13 @@
 # Product Requirements Document: MCP-Orchestrated AI Travel Agent
 
 **Main Takeaway:**  
-Build an intelligent AI travel agent that uses Model Context Protocol (MCP) tools to orchestrate itinerary generation. An AI agent (Claude/GPT-4) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
+Build an intelligent AI travel agent that uses Model Context Protoco**Technical Stack (Minimal Complexity)
+
+**Backend Framework:** FastMCP servers with MCP tool integration
+**AI Agent:** Claude-3.5 or GPT-4 via API with function calling
+**MCP Implementation:** Python MCP SDK for tool creation
+**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
+**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (Claude/GPT-4) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
 
 ## 1. Objective and Scope  
 
@@ -41,17 +47,28 @@ Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent to
 
 ### 4.1 Geocode Tool
 ```python
-@mcp_tool
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Geocoding Server")
+
+@mcp.tool()
 def geocode_location(location_name: str) -> dict:
     """
     Resolves location names to coordinates using OSM Nominatim
     Returns: {'lat': float, 'lon': float, 'display_name': str}
     """
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
 ```
 
 ### 4.2 POI Search Tool  
 ```python
-@mcp_tool
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("POI Discovery Server")
+
+@mcp.tool()
 def search_pois(latitude: float, longitude: float, 
                 category: str = "tourism", radius: int = 5000) -> List[dict]:
     """
@@ -59,26 +76,43 @@ def search_pois(latitude: float, longitude: float,
     Categories: tourism, historic, restaurant, entertainment, shopping
     Returns: [{'name': str, 'lat': float, 'lon': float, 'type': str}]
     """
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
 ```
 
 ### 4.3 Wikipedia Lookup Tool
 ```python
-@mcp_tool  
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Wikipedia Server")
+
+@mcp.tool()
 def get_wikipedia_info(poi_name: str, location_context: str) -> dict:
     """
     Fetches Wikipedia summaries and extracts for POIs
     Returns: {'summary': str, 'extract': str, 'url': str}
     """
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
 ```
 
 ### 4.4 Trivia Search Tool
 ```python
-@mcp_tool
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("Trivia Server")
+
+@mcp.tool()
 def get_trivia(topic: str, context: str = "") -> dict:
     """
     Searches DuckDuckGo for interesting facts and trivia
     Returns: {'trivia': str, 'source': str}
     """
+
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http")
 ```
 
 ## 5. Agent Orchestration Architecture
