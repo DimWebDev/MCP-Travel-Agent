@@ -9,7 +9,7 @@
 
 ### 2. Transport & run-command adjustments
 - [x] **Setup.md** - Added MCP CLI installation: `poetry run pip install "mcp[cli]"`
-- [x] **Setup.md** - Updated debug commands to use both `uv run mcp dev` and `python` direct execution
+- [x] **Setup.md** - Updated debug commands to use Poetry with `python` direct execution
 - [x] **Planning.md** - Updated communication patterns from "HTTP/SSE" to "Streamable HTTP (chunked) / SSE (fallback)"
 - [x] **Tasks.md** - Updated T014 to implement "fetch() & ReadableStream over `/mcp` (Streamable HTTP)"
 
@@ -29,8 +29,12 @@
 
 ### 1. Unit discovery
 ```bash
-uv run mcp dev app/mcp_servers/geocoding/server.py
+# Using Poetry to run MCP development server
+poetry run python -m mcp dev app/mcp_servers/geocoding/server.py
 # Expected: MCP Inspector opens; "Tools → geocode_location" visible
+
+# Alternative: Run server directly and test with MCP client
+poetry run python app/mcp_servers/geocoding/server.py
 ```
 
 ### 2. Manifest download
@@ -41,7 +45,7 @@ curl -s http://localhost:3000/mcp/manifest.json
 
 ### 3. Orchestrator handshake
 ```bash
-pytest tests/integration/test_agent_to_geocode.py
+poetry run pytest tests/integration/test_agent_to_geocode.py
 # Expected: Test passes; agent lists tool via MCP `list_tools`
 ```
 
@@ -63,6 +67,6 @@ pytest tests/integration/test_agent_to_geocode.py
 - **SDK Compatibility**: Your tools will auto-register and work with MCP clients
 - **Transport Efficiency**: Streamable HTTP is the recommended transport (SSE is legacy)
 - **Discovery & Manifests**: FastMCP auto-generates the manifest and capability handshake
-- **Development Experience**: MCP Inspector will work correctly for debugging
+- **Development Experience**: MCP Inspector will work correctly for debugging with Poetry
 
-Your documentation is now **fully aligned** with the official MCP Python SDK (FastMCP, v0.8+).
+Your documentation is now **fully aligned** with the official MCP Python SDK (FastMCP, v0.8+) using Poetry as the package manager.

@@ -1,93 +1,162 @@
 # MCP Travel Agent Development Setup Guide
 
-## First-Time Setup Commands (Ubuntu VM/Codex)
+## Complete Setup & Run Instructions (macOS/Linux)
 
-Run these commands once to set up your development environment in a fresh Ubuntu VM:
+### Prerequisites
+- Python 3.11+
+- Poetry (Python package manager)
+- Node.js 18+
+- Docker Desktop
+- Git
 
+### Installation Commands
+
+#### 1. Install Prerequisites (macOS)
 ```bash
-# 1. Install system dependencies
-sudo apt update
-sudo apt install -y python3.11 python3-pip nodejs npm docker.io docker-compose git curl
+# Install Homebrew (if not already installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# 2. Install Poetry (Python package manager)
-curl -sSL https://install.python-poetry.org | python3 -
-export PATH="$HOME/.local/bin:$PATH"
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+# Install required tools
+brew install python@3.11 poetry node docker git
 
-# 3. Clone and setup project structure
-git clone 
-cd mcp-travel-agent
-
-# 4. Install Python dependencies
-poetry install
-poetry run pip install "mcp[cli]"  # Add MCP CLI tools
-poetry shell
-
-# 5. Setup environment variables
-cp .env.example .env
-# Edit .env file with your OpenAI API key:
-nano .env
-# Add: OPENAI_API_KEY=sk-your-openai-api-key-here
-
-# 6. Setup frontend dependencies
-cd frontend
-npm install
-cd ..
-
-# 7. Verify installation
-poetry run python --version  # Should show Python 3.11+
-poetry run python -c "import fastapi; print('FastAPI installed')"
-poetry run python -c "import openai; print('OpenAI installed')"
+# Install Docker Desktop from https://docker.com/products/docker-desktop
+# Or install via Homebrew Cask:
+brew install --cask docker
 ```
 
-## Daily Development Workflow Commands
-
-Once your environment is set up, use these commands for daily development:
-
-### Option 1: Full Docker Development (Recommended)
+#### 2. Clone and Setup Project
 ```bash
-# Start all supporting services
-docker-compose up -d  # Starts all MCP servers + Redis
+# Clone the repository
+git clone https://github.com/DimWebDev/MCP-Travel-Agent.git
+cd MCP-Travel-Agent
 
-# Start main agent (separate terminal)
-poetry shell
-poetry run uvicorn app.agent.main:app --reload --host 0.0.0.0 --port 8000
+# Install Python dependencies
+poetry install
 
-# Start frontend (separate terminal)
+# Setup environment variables
+cp .env.example .env
+# Edit .env file and add your OpenAI API key:
+# OPENAI_API_KEY=sk-your-openai-api-key-here
+```
+
+#### 3. Verify Installation
+```bash
+# Check installations
+poetry run python --version  # Should show Python 3.11+
+poetry run python -c "import fastapi, mcp, openai; print('✅ All dependencies installed!')"
+```
+
+### How to Run the Application (Daily Workflow)
+
+### 1. Start Docker Desktop
+```bash
+# Open Docker Desktop app (required for MCP servers)
+open -a Docker
+# Wait for Docker to start up completely
+```
+
+### 2. Start all MCP servers and Redis
+```bash
+docker-compose up -d
+```
+
+### 3. Start the main AI agent (FastAPI backend)
+```bash
+poetry run uvicorn app.agent.main:app --reload
+```
+*The agent will be available at http://localhost:8000*
+
+### 4. Start the frontend (optional, for chat UI)
+```bash
+# In a new terminal
+cd frontend
+npm install  # Only needed first time
+npm run dev
+```
+*The frontend will be available at http://localhost:3000*
+
+---
+
+## Testing
+
+```bash
+# Run all Python tests
+poetry run pytest
+
+# Run specific test files
+poetry run pytest tests/unit/test_geocoding.py
+
+# Check test coverage
+poetry run pytest --cov=app
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Docker not starting:**
+- Make sure Docker Desktop is running
+- Check `docker ps` to see if containers are running
+
+**Poetry command not found:**
+- Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`
+- Add to PATH: `export PATH="$HOME/.local/bin:$PATH"`
+
+**OpenAI API errors:**
+- Check your `.env` file has the correct API key
+- Verify key starts with `sk-`
+
+**Port already in use:**
+- Change ports in commands: `--port 8001` for agent, or kill existing processes
+
+### Logs and Debugging
+
+```bash
+# View Docker logs
+docker-compose logs
+
+# View specific service logs
+docker-compose logs geocoding-server
+
+# Stop all services
+docker-compose down
+```
+
+## Quick Start Summary
+
+Once everything is installed:
+
+```bash
+# 1. Start Docker Desktop (GUI app)
+open -a Docker
+
+# 2. Start MCP servers
+docker-compose up -d
+
+# 3. Start agent (in new terminal)
+poetry run uvicorn app.agent.main:app --reload
+
+# 4. (Optional) Start frontend (in another terminal)
 cd frontend && npm run dev
 ```
 
-### Option 2: Individual Services for Debugging
-```bash
-# Start individual MCP servers for debugging (using FastMCP)
-uv run mcp dev app/mcp_servers/geocoding/server.py  # MCP Inspector
-python app/mcp_servers/geocoding/server.py          # Direct execution
+Visit:
+- **API Documentation:** http://localhost:8000/docs
+- **Chat Interface:** http://localhost:3000 (if frontend running)
 
-uv run mcp dev app/mcp_servers/poi_discovery/server.py
-python app/mcp_servers/poi_discovery/server.py
+---
 
-uv run mcp dev app/mcp_servers/wikipedia/server.py  
-python app/mcp_servers/wikipedia/server.py
+## Notes
+- You do **not** need to run individual MCP server scripts unless debugging.
+- All MCP servers and Redis are managed by Docker Compose.
+- The agent (FastAPI) and frontend run locally for best developer experience.
+- Edit `.env` for API keys if needed.
 
-uv run mcp dev app/mcp_servers/trivia/server.py
-python app/mcp_servers/trivia/server.py
+---
 
-# Start agent orchestrator
-poetry run uvicorn app.agent.main:app --reload --host 0.0.0.0 --port 8000
-```
+For more details, see `README.md`, `Tasks.md`, and `Planning.md`.
 
-### Testing Commands
-```bash
-# Run all tests
-poetry run pytest
-
-# Run specific test categories
-poetry run pytest tests/unit/
-poetry run pytest tests/integration/
-
-# Frontend tests
-cd frontend && npm test
-```
+---
 
 ## Development Architecture & Docker Usage
 
