@@ -1,5 +1,7 @@
+
 import asyncio
 import time
+import logging
 from typing import Any, List
 
 import httpx
@@ -34,10 +36,15 @@ class GeocodeResponse(BaseModel):
     display_name: str
 
 
+
 mcp = FastMCP("Geocoding Server")
 rate_limiter = RateLimiter(rate_per_sec=1)
 BASE_URL = "https://nominatim.openstreetmap.org"
 HEADERS = {"User-Agent": "MCP-Travel-Agent"}
+
+# Configure logging
+logger = logging.getLogger("geocoding-server")
+logging.basicConfig(level=logging.INFO)
 
 
 async def fetch_location(location_name: str) -> httpx.Response:
@@ -58,16 +65,20 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
         response = await fetch_location(request.location_name)
         response.raise_for_status()
     except httpx.TimeoutException as exc:
+        logger.error(f"Timeout while geocoding '{request.location_name}': {exc}")
         raise RuntimeError("Geocoding request timed out") from exc
     except httpx.HTTPError as exc:
+        logger.error(f"HTTP error while geocoding '{request.location_name}': {exc.response.status_code} - {exc}")
         raise RuntimeError(f"HTTP error: {exc.response.status_code}") from exc
 
     try:
         data: List[dict[str, Any]] = response.json()
     except ValueError as exc:
+        logger.error(f"Invalid JSON response for '{request.location_name}': {exc}")
         raise RuntimeError("Invalid response from geocoding API") from exc
 
     if not data:
+        logger.warning(f"Location not found for '{request.location_name}'")
         raise RuntimeError("Location not found")
 
     item = data[0]
@@ -78,6 +89,7 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
             display_name=item["display_name"],
         )
     except (KeyError, TypeError, ValueError) as exc:
+        logger.error(f"Unexpected response structure for '{request.location_name}': {exc}")
         raise RuntimeError("Unexpected response structure") from exc
 
 
