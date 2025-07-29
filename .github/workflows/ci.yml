@@ -9,18 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      # ➜ Add any API tokens here if you need them later
-      # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      RUN_LIVE_TESTS: "1"        # tells pytest to run the “integration” marker
+    strategy:
+      matrix:
+        # we only support Python 3.11
+        python-version: [3.11]
+
     steps:
-      # ────────────────────────────── checkout + Python + Poetry ─────────────────────────────
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -28,40 +28,48 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      # ────────────────────────────── cache the venv ─────────────────────────────
       - name: Cache Poetry venv
         id: cache-poetry
         uses: actions/cache@v4
         with:
           path: .venv
-          key: poetry-${{ runner.os }}-3.11-${{ hashFiles('**/poetry.lock') }}
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-      # ────────────────────────────── install deps ─────────────────────────────
       - name: Install dependencies & project
-        run: poetry install --no-interaction --no-root
+        run: |
+          poetry install --no-interaction
 
-      # ────────────────────────────── run unit tests first ─────────────────────
+      - name: Start Geocoding MCP server
+        id: geocode_server
+        run: |
+          # Launch the geocoding server in background
+          poetry run python app/mcp_servers/geocoding/server.py &
+
+          # FIX: record its PID in GitHub Actions outputs in `name=value` format
+          echo "server_pid=$!" >> $GITHUB_OUTPUT
+
+          # give the server a moment to start up
+          sleep 2
+
       - name: Run unit tests
         run: |
-          poetry run pytest -m "not integration" -v
+          poetry run pytest tests/unit --maxfail=1 --disable-warnings -q
 
-      # ────────────────────────────── start FastMCP server ─────────────────────
-      - name: Launch Geocoding FastMCP server (background)
+      - name: Run integration tests
+        # only run if the live-server step succeeded
+        if: steps.geocode_server.outcome == 'success'
         run: |
-          poetry run python app/mcp_servers/geocoding/server.py &
-          echo "Server PID $!" >> $GITHUB_OUTPUT
-      # Give the server a couple of seconds to bind to :8000
-      - run: sleep 8
+          # Use -s if you want to see the print() inspection output
+          poetry run pytest tests/integration/test_live_geocode.py -v
 
-      # ────────────────────────────── run integration tests ────────────────────
-      - name: Run integration tests (live)
+      - name: Stop Geocoding MCP server
+        if: always()
         run: |
-          poetry run pytest -m integration -v \
-            --cov=app --cov-append --cov-report=term-missing --cov-report=xml
-          poetry run python -c "import app.agent, app.mcp_servers; print('✅ Imports OK')"
+          # kill the background server using the recorded PID
+          kill ${{ steps.geocode_server.outputs.server_pid }} || true
 
-      # ────────────────────────────── upload coverage (3.11) ───────────────────
       - name: Upload coverage
+        if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
