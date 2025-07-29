@@ -9,17 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.11, 3.12]
-
+    env:
+      # ➜ Add any API tokens here if you need them later
+      # OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      RUN_LIVE_TESTS: "1"        # tells pytest to run the “integration” marker
     steps:
+      # ────────────────────────────── checkout + Python + Poetry ─────────────────────────────
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -27,24 +28,40 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
+      # ────────────────────────────── cache the venv ─────────────────────────────
       - name: Cache Poetry venv
         id: cache-poetry
         uses: actions/cache@v4
         with:
           path: .venv
-          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: poetry-${{ runner.os }}-3.11-${{ hashFiles('**/poetry.lock') }}
 
+      # ────────────────────────────── install deps ─────────────────────────────
       - name: Install dependencies & project
-        run: |
-          poetry install --no-interaction
+        run: poetry install --no-interaction --no-root
 
-      - name: Run tests
+      # ────────────────────────────── run unit tests first ─────────────────────
+      - name: Run unit tests
         run: |
-          poetry run pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=xml
+          poetry run pytest -m "not integration" -v
+
+      # ────────────────────────────── start FastMCP server ─────────────────────
+      - name: Launch Geocoding FastMCP server (background)
+        run: |
+          poetry run python app/mcp_servers/geocoding/server.py &
+          echo "Server PID $!" >> $GITHUB_OUTPUT
+      # Give the server a couple of seconds to bind to :8000
+      - run: sleep 8
+
+      # ────────────────────────────── run integration tests ────────────────────
+      - name: Run integration tests (live)
+        run: |
+          poetry run pytest -m integration -v \
+            --cov=app --cov-append --cov-report=term-missing --cov-report=xml
           poetry run python -c "import app.agent, app.mcp_servers; print('✅ Imports OK')"
 
-      - name: Upload coverage (3.11 only)
-        if: matrix.python-version == '3.11'
+      # ────────────────────────────── upload coverage (3.11) ───────────────────
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
