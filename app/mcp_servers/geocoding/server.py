@@ -75,7 +75,7 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
         data: List[dict[str, Any]] = response.json()
     except ValueError as exc:
         logger.error(f"Invalid JSON response for '{request.location_name}': {exc}")
-        raise RuntimeError("Failed to parse JSON response from geocoding API") from exc
+        raise RuntimeError("Invalid response from geocoding API") from exc
 
     if not data:
         logger.warning(f"Location not found for '{request.location_name}'")

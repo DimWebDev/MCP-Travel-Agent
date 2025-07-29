@@ -123,3 +123,95 @@ See `Tasks.md` for detailed acceptance criteria.
 Happy hacking — and enjoy building your MCP-powered travel companion! 
 
 ```
+
+
+## 🚦 Checking MCP Server Health with the Inspector GUI
+
+You can verify any FastMCP server end‐to‐end by using the **MCP Inspector**—a lightweight GUI + proxy that lets you visually discover and invoke your tools without hand-crafting JSON-RPC messages.
+
+---
+
+### 1. What Is the MCP Inspector?
+
+* **UI**: A browser-based interface where you can browse **Tools**, **Resources**, and **Prompts**, view their schemas, and call them interactively.
+* **Proxy**: A local HTTP proxy (default `localhost:6277`) that bridges the Inspector UI and your MCP server.  All traffic flows through this proxy so the UI can manage JSON-RPC sessions for you.
+
+---
+
+### 2. Launching the Inspector
+
+In one terminal, start **your MCP server** (e.g. geocoding):
+
+```bash
+poetry run python app/mcp_servers/geocoding/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector:
+
+```bash
+poetry run mcp dev app/mcp_servers/geocoding/server.py
+```
+
+You’ll see output similar to:
+
+```
+⚙️ Proxy server listening on localhost:6277
+🔑 Session token: 7d1324d291d383d3569a0d0a0722efa6ddc3cfeee6655e5cd6a69479b8c0a466
+   Use this token to authenticate requests or set DANGEROUSLY_OMIT_AUTH=true to disable auth
+
+🚀 MCP Inspector is up and running at:
+   http://localhost:6274
+
+🌐 Opening browser...
+```
+
+* **Port 6274**: the Inspector UI
+* **Port 6277**: the proxy that forwards UI requests to your MCP server
+* **Session token**: one-time key to unlock the proxy
+
+---
+
+### 3. Authenticating the Inspector
+
+By default, the proxy requires the printed **Session token**. You have two options:
+
+#### A. Paste the token in the UI
+
+1. In your browser, go to [http://localhost:6274](http://localhost:6274).
+2. In the left-hand panel, expand **Configuration → Authentication**.
+3. Paste the token (e.g. `7d1324d291d...`) into the **Session Token** field and click **Save**.
+4. Select **Transport Type → HTTP (streamable)** and set **Target →**
+
+   ```
+   http://127.0.0.1:8000/mcp
+   ```
+5. Click **Connect**.
+6. The status indicator will switch from **Disconnected** → **Connected**, and your tools will appear in the center pane.
+
+#### B. Disable auth (dev only)
+
+If you’re on a private machine and don’t want to deal with tokens, restart with:
+
+```bash
+DANGEROUSLY_OMIT_AUTH=true poetry run mcp dev app/mcp_servers/geocoding/server.py
+```
+
+This bypasses proxy authentication entirely.
+
+---
+
+### 4. Using the Inspector
+
+Once **Connected**, the Inspector UI shows:
+
+* **Tools**: click one (e.g. `geocode_location`)
+* **Schema**: input fields auto-generated from your Pydantic models
+* **Call panel**: enter parameters (e.g. `location_name = Athens`)
+* **Result stream**: live view of structured JSON + text content
+
+You can experiment freely—try edge cases, test error handling, and see progress messages in real time.
+
+---
+
