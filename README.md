@@ -215,3 +215,43 @@ You can experiment freely—try edge cases, test error handling, and see progres
 
 ---
 
+## 5 · Dev Workflow
+
+```bash
+# Hot-reload backend while editing
+poetry run uvicorn app.agent.main:app --reload
+
+# Unit tests
+poetry run pytest tests/unit
+
+# Integration test for Geocoding MCP server
+#   - Ensure your geocoding server is running on :8000
+#   - This hits the real OSM Nominatim API
+poetry run pytest tests/integration/test_live_geocode.py -s
+
+# Formatting / lint
+poetry run black .
+poetry run isort .
+````
+
+### 5.x · Integration Tests
+
+We include one end-to-end integration test for the Geocoding FastMCP server:
+
+* **File:** `tests/integration/test_live_geocode.py`
+* **What it does:**
+
+  1. Connects via streamable-HTTP
+  2. Lists the `geocode_location` tool and prints its JSON schema
+  3. Invokes the tool with `"Berlin"`
+  4. Prints both the raw JSON-RPC blocks and the parsed `structuredContent`
+  5. Asserts that `lat`, `lon`, and `display_name` are returned and that `"Berlin"` appears in the name
+* **Run it:**
+
+  ```bash
+  # Must have the geocoding server running:
+  poetry run python app/mcp_servers/geocoding/server.py
+
+  # Then execute:
+  poetry run pytest tests/integration/test_live_geocode.py -s
+  ```
