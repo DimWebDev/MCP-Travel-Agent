@@ -49,6 +49,7 @@ import json
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_live_geocode_location_inspect():
     """
