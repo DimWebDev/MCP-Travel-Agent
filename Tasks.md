@@ -18,14 +18,14 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T002: Create Geocoding MCP Server
 
-- [ ] Create app/mcp_servers/geocoding/server.py with OSM Nominatim wrapper (PRD\#4.1)
-- [ ] Implement rate limiting (1 req/sec) as specified in Planning\#5 dependencies
-- [ ] Add GeocodeRequest and GeocodeResponse Pydantic models for validation
-- [ ] Implement error handling for timeouts, HTTP errors, and API failures
-- [ ] Annotate function with `@mcp.tool()` from FastMCP
-- [ ] Write unit tests with mocked HTTP responses in tests/unit/test_geocoding.py
-- [ ] Create Dockerfile for containerized deployment (Planning\#4)
-- [ ] Test server manually with sample location queries
+- [x] Create app/mcp_servers/geocoding/server.py with OSM Nominatim wrapper (PRD\#4.1)
+- [x] Implement rate limiting (1 req/sec) as specified in Planning\#5 dependencies
+- [x] Add GeocodeRequest and GeocodeResponse Pydantic models for validation
+- [x] Implement error handling for timeouts, HTTP errors, and API failures
+- [x] Annotate function with `@mcp.tool()` from FastMCP
+- [x] Write unit tests with mocked HTTP responses in tests/unit/test_geocoding.py
+- [x] Create Dockerfile for containerized deployment (Planning\#4)
+- [x] Test server manually with sample location queries
 
 
 ### Task T003: Create POI Discovery MCP Server
