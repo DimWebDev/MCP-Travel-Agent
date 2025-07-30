@@ -17,7 +17,8 @@ multi-step reasoning, dynamic tool selection, and containerised micro-services.
 | **Docker + Compose** | 23+ | Docker Desktop or `apt install docker.io docker-compose` |
 | **Git** | any | – |
 
-> **No front-end yet** – only the FastAPI backend and four MCP micro-servers.
+ > **No front-end yet** – only the FastAPI backend and four MCP micro-servers.
+ > **CLI-first approach:** Initial agent orchestration and MCP server testing will be done via a command-line interface (REPL) before building the frontend.
 
 ---
 

@@ -68,7 +68,8 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
 
-- [ ] Create app/agent/main.py with FastAPI application setup
+ - [ ] **[CLI‑first]** Create app/agent/cli_agent.py or `main.py` that exposes the orchestrator via a simple REPL/command‑line interface
+ - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
 - [ ] Implement MCP client connections to all 4 servers (Planning\#4 architecture)
 - [ ] Create agent request/response models with Pydantic validation
 - [ ] Add health check endpoints for all MCP servers
