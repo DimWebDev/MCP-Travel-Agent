@@ -1,5 +1,8 @@
 # MCP Travel Agent 🚀
 
+> [!IMPORTANT]
+> **GitHub Project Status:**  
+> This repository is **under active development**. Features, documentation, and APIs will be updated frequently—check back often for the latest changes!
 AI-powered travel assistant that showcases **MCP (Model Context Protocol)** orchestration:
 multi-step reasoning, dynamic tool selection, and containerised micro-services.
 
