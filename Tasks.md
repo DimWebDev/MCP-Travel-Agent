@@ -68,7 +68,7 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
 
- - [ ] **[CLI‑first]** Create app/agent/cli_agent.py or `main.py` that exposes the orchestrator via a simple REPL/command‑line interface
+ - [ ] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
  - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
 - [ ] Implement MCP client connections to all 4 servers (Planning\#4 architecture)
 - [ ] Create agent request/response models with Pydantic validation
