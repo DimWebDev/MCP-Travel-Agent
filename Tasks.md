@@ -33,7 +33,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD\#4.2)
 - [ ] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
 - [ ] Build Overpass QL query generator for different POI categories
-- [ ] Add result filtering and ranking logic based on distance and importance
+- [ ] Add result filtering and ranking logic based on distance.
 - [ ] Implement POISearchRequest and POIResult Pydantic models
 - [ ] Annotate function with `@mcp.tool()` from FastMCP
 - [ ] Write comprehensive unit tests with mocked Overpass API responses
