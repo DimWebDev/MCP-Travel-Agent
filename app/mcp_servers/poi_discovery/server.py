@@ -1,3 +1,32 @@
+"""
+POI Discovery MCP Server: Architectural Overview
+
+CURRENT IMPLEMENTATION:
+-----------------------
+This server provides OBJECTIVE importance scoring based on OpenStreetMap data quality
+and factual signals (Wikipedia links, heritage status, data richness). This scoring
+represents the "general notability" of a POI independent of user context.
+
+ARCHITECTURAL COOPERATION WITH AGENT ORCHESTRATOR:
+--------------------------------------------------
+The Agent Orchestrator consumes this objective importance as ONE INPUT among many
+for its contextual decision-making:
+
+1. SERVER RESPONSIBILITY (Objective):
+   - Calculate importance based on factual OSM signals
+   - Provide consistent, repeatable scoring
+   - Remain context-blind but data-expert
+
+2. AGENT RESPONSIBILITY (Subjective):
+   - Interpret user intent ("famous" vs "hidden gems")
+   - Re-weight server importance based on context
+   - Combine importance with other factors (distance, user preferences)
+
+This separation allows the server to be the "data expert" while the agent
+remains the "context expert" - a clean architectural division.
+"""
+
+
 import httpx
 import asyncio
 import time
