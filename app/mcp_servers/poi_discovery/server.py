@@ -5,12 +5,15 @@ import logging
 from math import asin, cos, radians, sin, sqrt
 from typing import Any, Dict, List, Literal
 
+
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
+
 
 mcp = FastMCP("POI Discovery Server")
 logger = logging.getLogger("poi-discovery")
 logging.basicConfig(level=logging.INFO)
+
 
 CATEGORY_FILTERS: Dict[str, str] = {
     "tourism": '["tourism"]',
@@ -20,7 +23,9 @@ CATEGORY_FILTERS: Dict[str, str] = {
     "shopping": '["shop"]',
 }
 
+
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+
 
 
 class RateLimiter:
@@ -35,6 +40,7 @@ class RateLimiter:
         self._interval = 1.0 / rate_per_sec
         self._lock = asyncio.Lock()
         self._last_call = 0.0
+
 
     async def wait(self) -> None:
         """
@@ -51,8 +57,10 @@ class RateLimiter:
             self._last_call = time.monotonic()
 
 
+
 # Global rate limiter instance for Overpass API compliance
 overpass_rate_limiter = RateLimiter(rate_per_sec=1)
+
 
 
 class POISearchRequest(BaseModel):
@@ -71,6 +79,7 @@ class POISearchRequest(BaseModel):
     radius: int = Field(5000, ge=100, le=50000)  # Radius for INITIAL server-side filtering
 
 
+
 class POIResult(BaseModel):
     """
     Result model containing POI information with calculated distance.
@@ -84,7 +93,7 @@ class POIResult(BaseModel):
     lon: float
     type: str
     distance: float  # Exact distance in meters (calculated post-filtering)
-    importance: float | None = None
+
 
 
 def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -117,6 +126,7 @@ def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dlambda = radians(lon2 - lon1)
     a = sin(dphi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(dlambda / 2) ** 2
     return 2 * r * asin(sqrt(a))
+
 
 
 def build_query(lat: float, lon: float, radius: int, category: str) -> str:
@@ -155,6 +165,7 @@ def build_query(lat: float, lon: float, radius: int, category: str) -> str:
     out center;"""
 
 
+
 async def fetch_overpass(query: str) -> httpx.Response:
     """
     Execute Overpass API query with rate limiting compliance.
@@ -166,6 +177,7 @@ async def fetch_overpass(query: str) -> httpx.Response:
     await overpass_rate_limiter.wait()
     async with httpx.AsyncClient(timeout=30) as client:
         return await client.post(OVERPASS_URL, data=query)
+
 
 
 @mcp.tool()
@@ -203,7 +215,7 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
         request: POI search parameters including coordinates and radius
         
     Returns:
-        List of POI results sorted by importance (desc) then distance (asc),
+        List of POI results sorted by distance (ascending),
         limited to top 20 results for performance.
         
     Raises:
@@ -224,12 +236,14 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
         logger.error(f"Overpass request failed: {exc}")
         raise RuntimeError("POI search failed") from exc
 
+
     try:
         data: Dict[str, Any] = response.json()
         elements = data.get("elements", [])
     except ValueError as exc:
         logger.error(f"Invalid Overpass response: {exc}")
         raise RuntimeError("Invalid response from Overpass API") from exc
+
 
     results: List[POIResult] = []
     
@@ -245,14 +259,6 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
         tags = el.get("tags", {})
         name = tags.get("name")
         
-        # Parse importance score (if available)
-        imp = None
-        imp_tag = tags.get("importance")
-        try:
-            imp = float(imp_tag) if imp_tag is not None else None
-        except (TypeError, ValueError):
-            imp = None
-        
         # CRITICAL: Calculate EXACT distance using Haversine formula
         # This provides precise geodetic measurement for each already-filtered POI
         distance = _haversine(request.latitude, request.longitude, lat, lon)
@@ -264,14 +270,15 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
                 lon=float(lon),
                 type=el.get("type", "node"),
                 distance=distance,  # Exact distance for ranking and metadata
-                importance=imp,
             )
         )
 
-    # Sort by importance (descending) then by distance (ascending)
+
+    # Sort by distance (ascending) - closest POIs first
     # Uses the precisely calculated Haversine distances for accurate ranking
-    results.sort(key=lambda r: ((-(r.importance or 0)), r.distance))
+    results.sort(key=lambda r: r.distance)
     return results[:20]  # Return top 20 results for optimal performance
+
 
 
 if __name__ == "__main__":
