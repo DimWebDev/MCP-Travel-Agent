@@ -28,16 +28,17 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Test server manually with sample location queries
 
 
+
 ### Task T003: Create POI Discovery MCP Server
 
-- [ ] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD\#4.2)
-- [ ] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
-- [ ] Build Overpass QL query generator for different POI categories
-- [ ] Add result filtering and ranking logic based on distance.
-- [ ] Implement POISearchRequest and POIResult Pydantic models
-- [ ] Annotate function with `@mcp.tool()` from FastMCP
-- [ ] Write comprehensive unit tests with mocked Overpass API responses
-- [ ] Create Dockerfile and test with sample coordinate queries
+- [x] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD#4.2)
+- [x] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
+- [x] Build Overpass QL query generator for different POI categories
+- [x] Add result filtering and ranking logic based on distance.
+- [x] Implement POISearchRequest and POIResult Pydantic models
+- [x] Annotate function with `@mcp.tool()` from FastMCP
+- [x] Write comprehensive unit tests with mocked Overpass API responses
+- [x] Create Dockerfile and test with sample coordinate queries
 
 
 ### Task T004: Create Wikipedia MCP Server
