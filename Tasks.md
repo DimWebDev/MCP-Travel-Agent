@@ -52,7 +52,10 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Write unit tests with mocked Wikipedia API responses
 - [ ] Create Dockerfile and test with sample POI name queries
 
-**T004-extra** – TODO: Expose `/resources/city-guides/{city}.md` using `@mcp.resource` for static city-guide blurbs
+#### Task T004-extra: Wikipedia MCP Server Extras
+
+- [ ] Expose `/resources/city-guides/{city}.md` using `@mcp.resource` for static city-guide blurbs
+- [ ] Implement multi-language support detection for international POIs (**DEFERRED** – English only for MVP)
 
 
 ### Task T005: Create Trivia MCP Server
