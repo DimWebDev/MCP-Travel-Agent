@@ -89,3 +89,20 @@ async def test_wikipedia_http_error(monkeypatch):
 
     with pytest.raises(RuntimeError, match="Wikipedia API error"):
         await server.get_wikipedia_info(WikipediaRequest(poi_name="Test"))
+
+
+@pytest.mark.asyncio
+async def test_wikipedia_invalid_json_structure(monkeypatch):
+    """Test handling of malformed Wikipedia API responses"""
+    async def mock_search(poi_name: str, location_context: str | None = None) -> Dict[str, Any]:
+        # Return data that will cause KeyError when accessing expected fields
+        return {"unexpected_structure": "no extract field"}
+
+    async def async_noop():
+        pass
+
+    monkeypatch.setattr(server, "search_wikipedia", mock_search)
+    monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
+
+    with pytest.raises(RuntimeError, match="No Wikipedia article found"):
+        await server.get_wikipedia_info(WikipediaRequest(poi_name="InvalidStructure"))

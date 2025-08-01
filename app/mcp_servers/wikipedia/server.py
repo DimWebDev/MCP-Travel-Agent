@@ -233,9 +233,14 @@ async def get_wikipedia_info(request: WikipediaRequest) -> WikipediaResponse:
     except httpx.TimeoutException as exc:
         logger.error(f"Timeout while fetching Wikipedia info for '{request.poi_name}': {exc}")
         raise RuntimeError("Wikipedia request timed out") from exc
-    except httpx.HTTPError as exc:
-        logger.error(f"HTTP error while fetching Wikipedia info for '{request.poi_name}': {exc}")
+    except httpx.HTTPStatusError as exc:
+        # For status errors (4xx, 5xx), response is guaranteed to exist
+        logger.error(f"HTTP status error while fetching Wikipedia info for '{request.poi_name}': {exc.response.status_code}")
         raise RuntimeError(f"Wikipedia API error: {exc.response.status_code}") from exc
+    except httpx.HTTPError as exc:
+        # For other HTTP errors (connection, timeout, etc.)
+        logger.error(f"HTTP error while fetching Wikipedia info for '{request.poi_name}': {exc}")
+        raise RuntimeError("Wikipedia API error: connection failed") from exc
     except (ValueError, KeyError) as exc:
         logger.error(f"Invalid Wikipedia response for '{request.poi_name}': {exc}")
         raise RuntimeError("Invalid response from Wikipedia API") from exc
