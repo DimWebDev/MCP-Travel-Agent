@@ -28,16 +28,17 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Test server manually with sample location queries
 
 
+
 ### Task T003: Create POI Discovery MCP Server
 
-- [ ] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD\#4.2)
-- [ ] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
-- [ ] Build Overpass QL query generator for different POI categories
-- [ ] Add result filtering and ranking logic based on distance and importance
-- [ ] Implement POISearchRequest and POIResult Pydantic models
-- [ ] Annotate function with `@mcp.tool()` from FastMCP
-- [ ] Write comprehensive unit tests with mocked Overpass API responses
-- [ ] Create Dockerfile and test with sample coordinate queries
+- [x] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD#4.2)
+- [x] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
+- [x] Build Overpass QL query generator for different POI categories
+- [x] Add result filtering and ranking logic based on distance.
+- [x] Implement POISearchRequest and POIResult Pydantic models
+- [x] Annotate function with `@mcp.tool()` from FastMCP
+- [x] Write comprehensive unit tests with mocked Overpass API responses
+- [x] Create Dockerfile and test with sample coordinate queries
 
 
 ### Task T004: Create Wikipedia MCP Server
@@ -68,7 +69,8 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
 
-- [ ] Create app/agent/main.py with FastAPI application setup
+ - [ ] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
+ - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
 - [ ] Implement MCP client connections to all 4 servers (Planning\#4 architecture)
 - [ ] Create agent request/response models with Pydantic validation
 - [ ] Add health check endpoints for all MCP servers
@@ -76,6 +78,20 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Implement structured logging for agent decisions and tool calls
 - [ ] Add basic error handling and timeout management
 - [ ] Test agent-to-MCP-server communication with sample requests
+
+### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
+
+- **Dependencies:** Requires T002 (Geocoding) and T003 (POI Discovery) to be completed
+- Add logic in the orchestrator so that every call to `search_pois` carries a sensible `radius` 
+  based on:
+  - Urban vs rural density (using the geocoding result)
+  - POI category (e.g. ≤800 m for restaurants, 2 km for attractions)
+  - User intent keywords (e.g. "nearby", "around")
+- Ensure this defaulting is unit-tested.
+- Update the FastAPI endpoint Pydantic model to accept an optional `radius` (with `None` default), 
+  and fill in the orchestrated default before calling the MCP server.
+- Document the policy in code comments and in the OpenAPI schema (so it shows up in `/docs`).
+
 
 
 ### Task T007: Set Up Docker Compose Development Environment

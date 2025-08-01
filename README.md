@@ -1,5 +1,8 @@
 # MCP Travel Agent 🚀
 
+> [!IMPORTANT]
+> **GitHub Project Status:**  
+> This repository is **under active development**. Features, documentation, and APIs will be updated frequently—check back often for the latest changes!
 AI-powered travel assistant that showcases **MCP (Model Context Protocol)** orchestration:
 multi-step reasoning, dynamic tool selection, and containerised micro-services.
 
@@ -14,7 +17,8 @@ multi-step reasoning, dynamic tool selection, and containerised micro-services.
 | **Docker + Compose** | 23+ | Docker Desktop or `apt install docker.io docker-compose` |
 | **Git** | any | – |
 
-> **No front-end yet** – only the FastAPI backend and four MCP micro-servers.
+ > **No front-end yet** – only the FastAPI backend and four MCP micro-servers.
+ > **CLI-first approach:** Initial agent orchestration and MCP server testing will be done via a command-line interface (REPL) before building the frontend.
 
 ---
 
@@ -154,6 +158,26 @@ In a second terminal, start the Inspector:
 poetry run mcp dev app/mcp_servers/geocoding/server.py
 ```
 
+---
+
+**To run with the POI Discovery server, use these analogous commands:**
+
+In one terminal, start the **POI Discovery MCP server**:
+
+```bash
+poetry run python app/mcp_servers/poi_discovery/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector for the POI Discovery server:
+
+```bash
+poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+```
+
+---
+
 You’ll see output similar to:
 
 ```
@@ -197,6 +221,13 @@ If you’re on a private machine and don’t want to deal with tokens, restart w
 ```bash
 DANGEROUSLY_OMIT_AUTH=true poetry run mcp dev app/mcp_servers/geocoding/server.py
 ```
+
+**Or for the POI Discovery server:**
+
+```bash
+DANGEROUSLY_OMIT_AUTH=true poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+```
+
 
 This bypasses proxy authentication entirely.
 
