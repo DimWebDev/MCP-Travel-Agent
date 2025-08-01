@@ -77,6 +77,20 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Add basic error handling and timeout management
 - [ ] Test agent-to-MCP-server communication with sample requests
 
+### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
+
+- **Dependencies:** Requires T002 (Geocoding) and T003 (POI Discovery) to be completed
+- Add logic in the orchestrator so that every call to `search_pois` carries a sensible `radius` 
+  based on:
+  - Urban vs rural density (using the geocoding result)
+  - POI category (e.g. ≤800 m for restaurants, 2 km for attractions)
+  - User intent keywords (e.g. "nearby", "around")
+- Ensure this defaulting is unit-tested.
+- Update the FastAPI endpoint Pydantic model to accept an optional `radius` (with `None` default), 
+  and fill in the orchestrated default before calling the MCP server.
+- Document the policy in code comments and in the OpenAPI schema (so it shows up in `/docs`).
+
+
 
 ### Task T007: Set Up Docker Compose Development Environment
 

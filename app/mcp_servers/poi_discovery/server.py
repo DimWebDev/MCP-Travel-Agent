@@ -1,30 +1,37 @@
 """
-POI Discovery MCP Server: Architectural Overview
+POI Discovery MCP Server: Geographic Data Provider
 
 CURRENT IMPLEMENTATION:
 -----------------------
-This server provides OBJECTIVE importance scoring based on OpenStreetMap data quality
-and factual signals (Wikipedia links, heritage status, data richness). This scoring
-represents the "general notability" of a POI independent of user context.
+This server provides OBJECTIVE geographic and categorical POI data from OpenStreetMap
+without any importance scoring. It acts as a pure data provider that:
+
+- Filters POIs by category and geographic radius
+- Calculates precise distances using geodetic formulas  
+- Returns raw OSM data enriched with distance metadata
+- Remains completely context-blind and ranking-neutral
 
 ARCHITECTURAL COOPERATION WITH AGENT ORCHESTRATOR:
 --------------------------------------------------
-The Agent Orchestrator consumes this objective importance as ONE INPUT among many
-for its contextual decision-making:
+The Agent Orchestrator(the agent that orchestrates all the mcp servers) consumes this raw POI data and applies ALL contextual
+intelligence including importance assessment:
 
-1. SERVER RESPONSIBILITY (Objective):
-   - Calculate importance based on factual OSM signals
-   - Provide consistent, repeatable scoring
-   - Remain context-blind but data-expert
+1. SERVER RESPONSIBILITY (Objective Data Only):
+   - Perform geographic filtering via Overpass API
+   - Calculate precise distances using Haversine formula
+   - Provide structured OSM metadata (name, type, coordinates)
+   - Sort by distance (closest first) for consistent ordering
 
-2. AGENT RESPONSIBILITY (Subjective):
-   - Interpret user intent ("famous" vs "hidden gems")
-   - Re-weight server importance based on context
-   - Combine importance with other factors (distance, user preferences)
+2. AGENT RESPONSIBILITY (All Intelligence):
+   - Interpret user intent ("famous" vs "hidden gems")  
+   - Assess POI importance based on context and OSM tags
+   - Re-rank results according to user preferences
+   - Combine distance with contextual relevance
 
-This separation allows the server to be the "data expert" while the agent
-remains the "context expert" - a clean architectural division.
+This separation makes the server a reliable "geographic data expert" while
+the agent handles all subjective decision-making and importance assessment.
 """
+
 
 
 import httpx
