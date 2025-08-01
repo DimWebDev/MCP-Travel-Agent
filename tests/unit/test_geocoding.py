@@ -75,13 +75,10 @@ async def test_geocode_timeout(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_rate_limiter(monkeypatch):
-    times = [0.0, 0.0, 0.1, 0.1, 1.2, 1.2]
-    index = [0]
+    times = [0.0, 0.0, 0.1, 0.1, 1.2, 1.2, 1.3, 1.4]
 
     def fake_monotonic():
-        value = times[index[0]]
-        index[0] += 1
-        return value
+        return times.pop(0) if times else 1.5
 
     sleep_durations = []
 

@@ -158,6 +158,26 @@ In a second terminal, start the Inspector:
 poetry run mcp dev app/mcp_servers/geocoding/server.py
 ```
 
+---
+
+**To run with the POI Discovery server, use these analogous commands:**
+
+In one terminal, start the **POI Discovery MCP server**:
+
+```bash
+poetry run python app/mcp_servers/poi_discovery/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector for the POI Discovery server:
+
+```bash
+poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+```
+
+---
+
 You’ll see output similar to:
 
 ```
@@ -201,6 +221,13 @@ If you’re on a private machine and don’t want to deal with tokens, restart w
 ```bash
 DANGEROUSLY_OMIT_AUTH=true poetry run mcp dev app/mcp_servers/geocoding/server.py
 ```
+
+**Or for the POI Discovery server:**
+
+```bash
+DANGEROUSLY_OMIT_AUTH=true poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+```
+
 
 This bypasses proxy authentication entirely.
 
