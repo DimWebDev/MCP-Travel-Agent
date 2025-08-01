@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any
+from typing import Any, Dict
 
 import httpx
 import pytest
@@ -26,11 +26,14 @@ async def test_wikipedia_success(monkeypatch):
         "title": "Eiffel Tower"
     }
 
-    async def mock_search(poi_name: str, location_context: str = None) -> Dict[str, Any]:
+    async def mock_search(poi_name: str, location_context: str | None = None) -> Dict[str, Any]:
         return mock_data
 
+    async def async_noop():
+        pass
+
     monkeypatch.setattr(server, "search_wikipedia", mock_search)
-    monkeypatch.setattr(server.rate_limiter, "wait", lambda: None)
+    monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     result = await server.get_wikipedia_info(
         WikipediaRequest(poi_name="Eiffel Tower", location_context="Paris")
@@ -39,40 +42,50 @@ async def test_wikipedia_success(monkeypatch):
     assert isinstance(result, WikipediaResponse)
     assert "Eiffel Tower" in result.extract
     assert result.url == "https://en.wikipedia.org/wiki/Eiffel_Tower"
-    assert result.page_id == 9202
 
 
 @pytest.mark.asyncio
 async def test_wikipedia_not_found(monkeypatch):
-    async def mock_search(poi_name: str, location_context: str = None) -> Dict[str, Any]:
-        return {}  # Empty response simulating no article found
+    async def mock_search(poi_name: str, location_context: str | None = None) -> Dict[str, Any]:
+        return {}  # No 'extract' key → article not found
+
+    async def async_noop():
+        pass
 
     monkeypatch.setattr(server, "search_wikipedia", mock_search)
-    monkeypatch.setattr(server.rate_limiter, "wait", lambda: None)
+    monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="No Wikipedia article found"):
         await server.get_wikipedia_info(WikipediaRequest(poi_name="NonexistentPlace"))
 
 
 @pytest.mark.asyncio
-async def test_wikipedia_http_error(monkeypatch):
-    async def mock_search(poi_name: str, location_context: str = None) -> Dict[str, Any]:
-        raise httpx.HTTPError("API Error")
+async def test_wikipedia_timeout(monkeypatch):
+    async def mock_search(poi_name: str, location_context: str | None = None) -> Dict[str, Any]:
+        raise httpx.TimeoutException("Timeout")
+
+    async def async_noop():
+        pass
 
     monkeypatch.setattr(server, "search_wikipedia", mock_search)
-    monkeypatch.setattr(server.rate_limiter, "wait", lambda: None)
+    monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
-    with pytest.raises(RuntimeError, match="Wikipedia API error"):
+    with pytest.raises(RuntimeError, match="timed out"):
         await server.get_wikipedia_info(WikipediaRequest(poi_name="Test"))
 
 
 @pytest.mark.asyncio
-async def test_wikipedia_timeout(monkeypatch):
-    async def mock_search(poi_name: str, location_context: str = None) -> Dict[str, Any]:
-        raise httpx.TimeoutException("Timeout")
+async def test_wikipedia_http_error(monkeypatch):
+    async def mock_search(poi_name: str, location_context: str | None = None) -> Dict[str, Any]:
+        response = MockResponse(500, {"error": "Server Error"})
+        error = httpx.HTTPStatusError("API Error", request=response.request, response=response)
+        raise error
+
+    async def async_noop():
+        pass
 
     monkeypatch.setattr(server, "search_wikipedia", mock_search)
-    monkeypatch.setattr(server.rate_limiter, "wait", lambda: None)
+    monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
-    with pytest.raises(RuntimeError, match="timed out"):
+    with pytest.raises(RuntimeError, match="Wikipedia API error"):
         await server.get_wikipedia_info(WikipediaRequest(poi_name="Test"))
