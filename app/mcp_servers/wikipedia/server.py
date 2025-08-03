@@ -126,19 +126,40 @@ async def search_wikipedia(poi_name: str, location_context: Optional[str] = None
         
     Returns:
         Dictionary containing search results from Wikipedia API
+        
+    Raises:
+        RuntimeError: If no suitable Wikipedia article is found
     """
     search_query = poi_name
     if location_context:
         search_query = f"{poi_name} {location_context}"
     
     async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(
-            "https://en.wikipedia.org/api/rest_v1/page/summary/" + search_query.replace(" ", "_"),
-            headers=HEADERS
-        )
+        # Try direct summary API first
+        try:
+            response = await client.get(
+                "https://en.wikipedia.org/api/rest_v1/page/summary/" + search_query.replace(" ", "_"),
+                headers=HEADERS
+            )
+            if response.status_code == 200:
+                return response.json()
+        except httpx.HTTPError:
+            pass  # Continue to fallback
         
-        if response.status_code == 404:
-            # Try opensearch API as fallback
+        # Fallback 1: Try just the POI name without location context
+        if location_context:
+            try:
+                response = await client.get(
+                    "https://en.wikipedia.org/api/rest_v1/page/summary/" + poi_name.replace(" ", "_"),
+                    headers=HEADERS
+                )
+                if response.status_code == 200:
+                    return response.json()
+            except httpx.HTTPError:
+                pass  # Continue to next fallback
+        
+        # Fallback 2: Use opensearch API endpoint to find best match
+        try:
             opensearch_response = await client.get(
                 "https://en.wikipedia.org/w/api.php",
                 params={
@@ -154,14 +175,21 @@ async def search_wikipedia(poi_name: str, location_context: Optional[str] = None
             
             if opensearch_data[1]:  # If we found results
                 title = opensearch_data[1][0]
-                # Try to get the summary for this title
-                response = await client.get(
-                    f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}",
-                    headers=HEADERS
-                )
+                try:
+                    # Try to get the summary for this title
+                    response = await client.get(
+                        f"https://en.wikipedia.org/api/rest_v1/page/summary/{title.replace(' ', '_')}",
+                        headers=HEADERS
+                    )
+                    if response.status_code == 200:
+                        return response.json()
+                except httpx.HTTPError:
+                    pass  # Continue to final fallback
+        except httpx.HTTPError:
+            pass  # Continue to final fallback
         
-        response.raise_for_status()
-        return response.json()
+        # If all attempts failed, raise an error
+        raise RuntimeError(f"No Wikipedia article found for '{poi_name}'")
 
 
 @mcp.tool()

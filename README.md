@@ -178,6 +178,24 @@ poetry run mcp dev app/mcp_servers/poi_discovery/server.py
 
 ---
 
+**To run with the Wikipedia server, use these analogous commands:**
+
+In one terminal, start the **Wikipedia MCP server**:
+
+```bash
+poetry run python app/mcp_servers/wikipedia/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector for the Wikipedia server:
+
+```bash
+poetry run mcp dev app/mcp_servers/wikipedia/server.py
+```
+
+---
+
 You’ll see output similar to:
 
 ```
