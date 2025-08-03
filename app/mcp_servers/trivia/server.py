@@ -46,9 +46,7 @@ HEADERS = {
     "Accept": "application/json",
 }
 
-
 # Conservative rate limit: 1 request/second
-
 
 class RateLimiter:
     """Asynchronous rate limiter to enforce minimum delay between requests."""
@@ -67,13 +65,11 @@ class RateLimiter:
                 await asyncio.sleep(sleep_for)
             self._last_call = time.monotonic()
 
-
 rate_limiter = RateLimiter(rate_per_sec=1)
 
 # ---------------------------------------------------------------------------
 # Pydantic Models
 # ---------------------------------------------------------------------------
-
 
 class TriviaRequest(BaseModel):
     """Request model for trivia lookups."""
@@ -83,7 +79,6 @@ class TriviaRequest(BaseModel):
         default=None,
         description="Optional travel context such as a city or country",
     )
-
 
 class TriviaResponse(BaseModel):
     """Structured trivia fact and metadata."""
@@ -95,6 +90,10 @@ class TriviaResponse(BaseModel):
         description="Source reliability score between 0 and 1", ge=0.0, le=1.0
     )
 
+# --- Resolve forward references for Pydantic v2 -----------------------------
+TriviaRequest.model_rebuild()
+TriviaResponse.model_rebuild()
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # Reliability scoring and travel relevance helpers
@@ -107,29 +106,18 @@ SOURCE_RELIABILITY = {
 }
 RELIABILITY_THRESHOLD = 0.6
 TRAVEL_KEYWORDS = {
-    "travel",
-    "tourist",
-    "tourism",
-    "visit",
-    "destination",
-    "city",
-    "country",
-    "landmark",
-    "museum",
-    "beach",
-    "mountain",
+    "travel", "tourist", "tourism", "visit", "destination",
+    "city", "country", "landmark", "museum", "beach", "mountain",
+    "attraction", "monument", "historic", "culture", "architecture",
+    "famous", "popular", "location", "site", "built", "constructed",
 }
-
 
 def score_source(source: str) -> float:
     """Return reliability score for a source name."""
-
     return SOURCE_RELIABILITY.get(source.lower(), 0.5)
-
 
 def matches_context(text: str, request: TriviaRequest) -> bool:
     """Check if a fact matches provided context and travel relevance."""
-
     text_lower = text.lower()
     if request.context:
         context_words = request.context.lower().split()
@@ -139,15 +127,12 @@ def matches_context(text: str, request: TriviaRequest) -> bool:
     relevant_keywords = TRAVEL_KEYWORDS.union(topic_words)
     return any(word in text_lower for word in relevant_keywords)
 
-
 # ---------------------------------------------------------------------------
 # DuckDuckGo API wrapper
 # ---------------------------------------------------------------------------
 
-
 async def fetch_duckduckgo(topic: str, context: Optional[str]) -> Dict[str, Any]:
     """Query DuckDuckGo Instant Answer API and return JSON data."""
-
     query = f"{topic} {context}".strip()
     params = {
         "q": query,
@@ -161,49 +146,82 @@ async def fetch_duckduckgo(topic: str, context: Optional[str]) -> Dict[str, Any]
         response.raise_for_status()
         return response.json()
 
-
 # ---------------------------------------------------------------------------
-# Fact extraction logic
+# Fact extraction logic with fallback strategy
 # ---------------------------------------------------------------------------
-
 
 def extract_fact(data: Dict[str, Any], request: TriviaRequest) -> Tuple[str, str, str]:
-    """Extract a context-matched fact from DuckDuckGo response."""
+    """
+    Extract a context-matched fact from DuckDuckGo response using fallback logic.
 
+    FALLBACK STRATEGY:
+    ------------------
+    Stage 1: STRICT FILTERING - Both context matching AND travel relevance required
+    Stage 2: RELAXED FILTERING - Only topic matching required (if Stage 1 fails)
+
+    This two-stage approach ensures high-quality results when possible while
+    providing graceful degradation to prevent "No trivia found" errors.
+    """
     candidates: list[Tuple[str, str, str]] = []
-    # Primary abstract
+
+    # Collect all potential facts from DuckDuckGo response
     abstract = data.get("AbstractText")
     if abstract:
         candidates.append(
-            (
-                abstract,
-                data.get("AbstractSource", "DuckDuckGo"),
-                data.get("AbstractURL", ""),
-            )
+            (abstract, data.get("AbstractSource", "DuckDuckGo"), data.get("AbstractURL", "")),
         )
+
     # Related topics may contain additional facts
     for item in data.get("RelatedTopics", []):
         if isinstance(item, dict):
             if "Text" in item:
-                candidates.append(
-                    (item["Text"], "DuckDuckGo", item.get("FirstURL", ""))
-                )
+                candidates.append((item["Text"], "DuckDuckGo", item.get("FirstURL", "")))
             elif "Topics" in item:
                 for sub in item.get("Topics", []):
                     if "Text" in sub:
-                        candidates.append(
-                            (sub["Text"], "DuckDuckGo", sub.get("FirstURL", ""))
-                        )
+                        candidates.append((sub["Text"], "DuckDuckGo", sub.get("FirstURL", "")))
+
+    # STAGE 1: Try strict filtering (context + travel keywords)
+    strict_result = _extract_fact_strict(candidates, request)
+    if strict_result[0]:
+        return strict_result
+
+    # STAGE 2: Fallback to relaxed filtering (topic-only)
+    return _extract_fact_relaxed(candidates, request)
+
+def _extract_fact_strict(candidates: list[Tuple[str, str, str]], request: TriviaRequest) -> Tuple[str, str, str]:
+    """Apply strict filtering requiring both context matching AND travel relevance."""
     for text, source, url in candidates:
         if matches_context(text, request):
             return text, source, url
     return "", "", ""
 
+def _extract_fact_relaxed(candidates: list[Tuple[str, str, str]], request: TriviaRequest) -> Tuple[str, str, str]:
+    """Apply relaxed filtering requiring only topic matching."""
+    topic_words = set(request.topic.lower().split())
+
+    # First pass: topic match + optional context preference
+    for text, source, url in candidates:
+        text_lower = text.lower()
+        if any(topic_word in text_lower for topic_word in topic_words):
+            if request.context:
+                context_words = request.context.lower().split()
+                if any(context_word in text_lower for context_word in context_words):
+                    return text, source, url
+            else:
+                return text, source, url
+
+    # Final fallback: any topic match
+    for text, source, url in candidates:
+        text_lower = text.lower()
+        if any(topic_word in text_lower for topic_word in topic_words):
+            return text, source, url
+
+    return "", "", ""
 
 # ---------------------------------------------------------------------------
 # MCP Tool Implementation
 # ---------------------------------------------------------------------------
-
 
 @mcp.tool()
 async def get_trivia(request: TriviaRequest) -> TriviaResponse:
@@ -212,14 +230,13 @@ async def get_trivia(request: TriviaRequest) -> TriviaResponse:
 
     WORKFLOW:
     1. Fetch data from DuckDuckGo with rate limiting
-    2. Extract context-matched fact
+    2. Extract context-matched fact using fallback logic
     3. Score source reliability and filter low-quality results
     4. Return structured trivia response
 
     Raises:
         RuntimeError: On network errors, missing data, or low-reliability sources
     """
-
     try:
         data = await fetch_duckduckgo(request.topic, request.context)
     except httpx.TimeoutException as exc:
@@ -237,10 +254,7 @@ async def get_trivia(request: TriviaRequest) -> TriviaResponse:
     if reliability < RELIABILITY_THRESHOLD:
         raise RuntimeError("Low reliability source")
 
-    return TriviaResponse(
-        trivia=fact, source=source, url=url or None, reliability=reliability
-    )
-
+    return TriviaResponse(trivia=fact, source=source, url=url or None, reliability=reliability)
 
 # ---------------------------------------------------------------------------
 # Entrypoint
