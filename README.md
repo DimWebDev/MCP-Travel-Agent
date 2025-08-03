@@ -178,6 +178,24 @@ poetry run mcp dev app/mcp_servers/poi_discovery/server.py
 
 ---
 
+**To run with the Wikipedia server, use these analogous commands:**
+
+In one terminal, start the **Wikipedia MCP server**:
+
+```bash
+poetry run python app/mcp_servers/wikipedia/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector for the Wikipedia server:
+
+```bash
+poetry run mcp dev app/mcp_servers/wikipedia/server.py
+```
+
+---
+
 You’ll see output similar to:
 
 ```
@@ -248,41 +266,95 @@ You can experiment freely—try edge cases, test error handling, and see progres
 
 ## 5 · Dev Workflow
 
+### 5.1 · Quick Commands
+
 ```bash
 # Hot-reload backend while editing
 poetry run uvicorn app.agent.main:app --reload
 
-# Unit tests
+# Unit tests (all MCP servers)
 poetry run pytest tests/unit
-
-# Integration test for Geocoding MCP server
-#   - Ensure your geocoding server is running on :8000
-#   - This hits the real OSM Nominatim API
-poetry run pytest tests/integration/test_live_geocode.py -s
 
 # Formatting / lint
 poetry run black .
 poetry run isort .
-````
+```
 
-### 5.x · Integration Tests
+Docker services stay up; restart them only after editing a micro-server.
 
-We include one end-to-end integration test for the Geocoding FastMCP server:
+### 5.2 · MCP Server Testing: Individual vs. Integration
 
-* **File:** `tests/integration/test_live_geocode.py`
-* **What it does:**
+**Individual MCP Server Testing** (Test one server in isolation):
 
-  1. Connects via streamable-HTTP
-  2. Lists the `geocode_location` tool and prints its JSON schema
-  3. Invokes the tool with `"Berlin"`
-  4. Prints both the raw JSON-RPC blocks and the parsed `structuredContent`
-  5. Asserts that `lat`, `lon`, and `display_name` are returned and that `"Berlin"` appears in the name
-* **Run it:**
+```bash
+# 1. Start the specific MCP server you want to test
+poetry run python app/mcp_servers/geocoding/server.py
+# OR
+poetry run python app/mcp_servers/poi_discovery/server.py
+# OR
+poetry run python app/mcp_servers/wikipedia/server.py
 
-  ```bash
-  # Must have the geocoding server running:
-  poetry run python app/mcp_servers/geocoding/server.py
+# 2. In another terminal, run its integration test
+poetry run pytest tests/integration/test_live_geocode.py -s
+# OR
+poetry run pytest tests/integration/test_live_poi_discovery.py -s
+# OR
+poetry run pytest tests/integration/test_live_wikipedia.py -s
+```
 
-  # Then execute:
-  poetry run pytest tests/integration/test_live_geocode.py -s
-  ```
+**Full System Integration Testing** (All servers via orchestrator):
+
+```bash
+# 1. Start the full FastAPI orchestrator (which connects to all MCP servers)
+poetry run uvicorn app.agent.main:app --reload
+
+# 2. Run comprehensive system tests
+poetry run pytest tests/integration/ -s
+```
+
+### 5.3 · MCP Inspector for Visual Testing
+
+For interactive testing and debugging of individual MCP servers:
+
+```bash
+# Start your MCP server first
+poetry run python app/mcp_servers/geocoding/server.py
+
+# Then launch the MCP Inspector in another terminal
+poetry run mcp dev app/mcp_servers/geocoding/server.py
+# Opens browser UI at http://localhost:6274
+```
+
+### 5.4 · Integration Tests Details
+
+We include end-to-end integration tests for each FastMCP server:
+
+* **Geocoding:** `tests/integration/test_live_geocode.py`
+  - Connects via streamable-HTTP to running geocoding server
+  - Lists the `geocode_location` tool and prints its JSON schema
+  - Invokes the tool with `"Berlin"`
+  - Prints raw JSON-RPC blocks and parsed `structuredContent`
+  - Asserts that `lat`, `lon`, and `display_name` are returned
+
+* **POI Discovery:** `tests/integration/test_live_poi_discovery.py`
+  - Tests `search_pois` tool with Berlin tourism query
+  - Validates POI results structure and distance sorting
+  - Prints complete tool schema and response data
+
+* **Wikipedia:** `tests/integration/test_live_wikipedia.py`
+  - Tests `get_wikipedia_info` tool with "Eiffel Tower" query
+  - Validates Wikipedia content extraction and URL generation
+  - Ensures summary, extract, and title fields are present
+
+**Run individual integration tests:**
+
+```bash
+# Must have the specific server running first:
+poetry run python app/mcp_servers/geocoding/server.py
+
+# Then execute in another terminal:
+poetry run pytest tests/integration/test_live_geocode.py -s
+```
+
+The `-s` flag disables pytest's output capture so you see all debug information, including tool schemas and response structures.
+
