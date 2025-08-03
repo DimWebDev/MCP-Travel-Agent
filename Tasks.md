@@ -41,15 +41,16 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Create Dockerfile and test with sample coordinate queries
 
 
+
 ### Task T004: Create Wikipedia MCP Server
 
- [ ] Create app/mcp_servers/wikipedia/server.py with Wikipedia API wrapper (PRD\#4.3)
- [ ] Implement content extraction and summarization logic
- [ ] Add rate limiting (5000 req/hour) as specified in Planning\#5
- [ ] Create WikipediaRequest and WikipediaResponse Pydantic models
- [ ] Annotate function with `@mcp.tool()` from FastMCP
-- [ ] Write unit tests with mocked Wikipedia API responses
-- [ ] Create Dockerfile and test with sample POI name queries
+- [x] Create app/mcp_servers/wikipedia/server.py with Wikipedia API wrapper (PRD#4.3)
+- [x] Implement content extraction and summarization logic
+- [x] Add rate limiting (5000 req/hour) as specified in Planning#5
+- [x] Create WikipediaRequest and WikipediaResponse Pydantic models
+- [x] Annotate function with `@mcp.tool()` from FastMCP
+- [x] Write unit tests with mocked Wikipedia API responses
+- [x] Create Dockerfile and test with sample POI name queries
 
 #### Task T004-extra: Wikipedia MCP Server Extras
 
