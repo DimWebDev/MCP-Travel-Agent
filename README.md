@@ -150,9 +150,14 @@ Happy hacking — and enjoy building your MCP-powered travel companion!
 ```
 
 
+
 ## 🚦 Checking MCP Server Health with the Inspector GUI
 
-You can verify any FastMCP server end‐to‐end by using the **MCP Inspector**—a lightweight GUI + proxy that lets you visually discover and invoke your tools without hand-crafting JSON-RPC messages.
+> **Inspector for FastMCP 2.x+**
+> 
+> For FastMCP 2.x and later, always use `poetry run fastmcp dev ...` to launch the Inspector. The legacy `mcp dev` CLI is not compatible with FastMCP 2.x servers. The built-in Inspector provides a web-based UI for tool discovery and testing.
+
+You can verify any FastMCP server end‐to‐end by using the **FastMCP Inspector**—a lightweight GUI + proxy that lets you visually discover and invoke your tools without hand-crafting JSON-RPC messages.
 
 ---
 
@@ -173,13 +178,15 @@ poetry run python app/mcp_servers/geocoding/server.py
 
 Leave that running.
 
+
 In a second terminal, start the Inspector:
 
 ```bash
-poetry run mcp dev app/mcp_servers/geocoding/server.py
+poetry run fastmcp dev app/mcp_servers/geocoding/server.py
 ```
 
 ---
+
 
 **To run with the POI Discovery server, use these analogous commands:**
 
@@ -191,14 +198,14 @@ poetry run python app/mcp_servers/poi_discovery/server.py
 
 Leave that running.
 
-
 In a second terminal, start the Inspector for the POI Discovery server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+poetry run fastmcp dev app/mcp_servers/poi_discovery/server.py
 ```
 
 ---
+
 
 **To run with the Wikipedia server, use these analogous commands:**
 
@@ -213,10 +220,11 @@ Leave that running.
 In a second terminal, start the Inspector for the Wikipedia server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/wikipedia/server.py
+poetry run fastmcp dev app/mcp_servers/wikipedia/server.py
 ```
 
 ---
+
 
 
 **To run with the Trivia server, use these analogous commands:**
@@ -232,7 +240,7 @@ Leave that running.
 In a second terminal, start the Inspector for the Trivia server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/trivia/server.py
+poetry run fastmcp dev app/mcp_servers/trivia/server.py
 ```
 
 ---
@@ -355,14 +363,15 @@ poetry run pytest tests/integration/ -s
 
 ### 5.3 · MCP Inspector for Visual Testing
 
+
 For interactive testing and debugging of individual MCP servers:
 
 ```bash
 # Start your MCP server first
 poetry run python app/mcp_servers/geocoding/server.py
 
-# Then launch the MCP Inspector in another terminal
-poetry run mcp dev app/mcp_servers/geocoding/server.py
+# Then launch the FastMCP Inspector in another terminal
+poetry run fastmcp dev app/mcp_servers/geocoding/server.py
 # Opens browser UI at http://localhost:6274
 ```
 
