@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+**Dev Note:** During local development, agent orchestration and integration can be tested by running all MCP servers in parallel with `run_all_servers.py`. 
+This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 Run all MCP servers in parallel for integration testing.
 
 This script starts all four MCP servers (geocoding, poi_discovery, wikipedia, trivia)
