@@ -1,4 +1,3 @@
-
 """
 tests/integration/test_live_wikipedia.py
 ----------------------------------------
