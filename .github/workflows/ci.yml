@@ -55,12 +55,12 @@ jobs:
         run: |
           poetry run pytest tests/unit --maxfail=1 --disable-warnings -q
 
-      # - name: Run integration tests
-      #   # only run if the live-server step succeeded
-      #   if: steps.geocode_server.outcome == 'success'
-      #   run: |
-      #     # Use -s if you want to see the print() inspection output
-      #     poetry run pytest tests/integration/test_live_geocode.py -v
+      - name: Run integration tests
+        # only run if the live-server step succeeded
+        if: steps.geocode_server.outcome == 'success'
+        run: |
+          # Use -s if you want to see the print() inspection output
+          poetry run pytest tests/integration/test_live_geocode.py -v
 
       - name: Stop Geocoding MCP server
         if: always()
