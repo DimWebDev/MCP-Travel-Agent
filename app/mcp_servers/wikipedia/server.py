@@ -30,9 +30,9 @@ import asyncio
 import time
 import logging
 from typing import Any, Dict, Optional
-
+import os
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 
@@ -276,9 +276,9 @@ async def get_wikipedia_info(request: WikipediaRequest) -> WikipediaResponse:
 
 if __name__ == "__main__":
     """
-    Run the Wikipedia MCP server with streamable HTTP transport.
+    Run the Wikipedia MCP server with HTTP transport.
     
-    The server will start on the default port and be ready to accept
+    The server will start on port 8003 and be ready to accept
     MCP tool calls from the Agent Orchestrator for content enrichment.
     """
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8003)

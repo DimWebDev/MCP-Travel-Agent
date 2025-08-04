@@ -49,6 +49,27 @@ Open **[http://localhost:8000/docs](http://localhost:8000/docs)** → interactiv
 
 ---
 
+
+## 2a · Running All MCP Servers Locally (No Docker)
+
+For local development and integration testing, you can run all four MCP micro-servers in parallel using the provided script:
+
+```bash
+poetry run python run_all_servers.py
+```
+
+This will start:
+
+- Geocoding Server:      http://127.0.0.1:8001/mcp/
+- POI Discovery Server:  http://127.0.0.1:8002/mcp/
+- Wikipedia Server:      http://127.0.0.1:8003/mcp/
+- Trivia Server:         http://127.0.0.1:8004/mcp/
+
+Press Ctrl+C to stop all servers.
+
+> **Note:** This is an alternative to `docker-compose up` for local development. Use Docker for production or when you need Redis and all services together.
+
+---
 ## 3 · Project Layout
 
 ```

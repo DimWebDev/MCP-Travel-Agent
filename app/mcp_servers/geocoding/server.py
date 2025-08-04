@@ -28,9 +28,10 @@ import asyncio
 import time
 import logging
 from typing import Any, List
+import os
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel
 
 
@@ -222,11 +223,11 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
 
 if __name__ == "__main__":
     """
-    Run the geocoding MCP server with streamable HTTP transport.
+    Run the geocoding MCP server with HTTP transport.
     
-    The server will start on the default port and be ready to accept
-    MCP tool calls from the Agent Orchestrator. Use streamable-http
-    transport for optimal performance and compatibility with the
-    MCP travel agent system architecture.
+    The server will start on port 8001 and be ready to accept MCP tool calls 
+    from the Agent Orchestrator. Use HTTP transport 
+    for optimal performance and compatibility with the MCP 
+    travel agent system architecture.
     """
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8001)

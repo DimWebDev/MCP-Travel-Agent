@@ -71,7 +71,10 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Create Dockerfile and test with sample topic queries
 
 
+
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
+
+> **Dev Note:** During local development, agent orchestration and integration can be tested by running all MCP servers in parallel with `run_all_servers.py`. This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 
  - [ ] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
  - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI

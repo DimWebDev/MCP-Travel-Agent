@@ -26,10 +26,12 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+
 from typing import Any, Dict, Optional, Tuple
+import os
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
@@ -261,4 +263,4 @@ async def get_trivia(request: TriviaRequest) -> TriviaResponse:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8004)
