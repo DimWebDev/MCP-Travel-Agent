@@ -217,10 +217,9 @@ async def fetch_overpass(query: str) -> httpx.Response:
 
 
 
-@mcp.tool()
-async def search_pois(request: POISearchRequest) -> List[POIResult]:
+async def _search_pois_impl(request: POISearchRequest) -> List[POIResult]:
     """
-    Discover POIs using a two-stage filtering and distance calculation architecture.
+    Implementation of POI discovery using a two-stage filtering and distance calculation architecture.
     
     WORKFLOW EXPLANATION:
     =====================
@@ -315,6 +314,16 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
     # Uses the precisely calculated Haversine distances for accurate ranking
     results.sort(key=lambda r: r.distance)
     return results[:20]  # Return top 20 results for optimal performance
+
+
+@mcp.tool()
+async def search_pois(request: POISearchRequest) -> List[POIResult]:
+    """
+    Discover POIs using a two-stage filtering and distance calculation architecture.
+    
+    This is the MCP tool wrapper that delegates to the implementation function.
+    """
+    return await _search_pois_impl(request)
 
 
 
