@@ -102,7 +102,7 @@ For each major feature or milestone, break down the implementation into clear, s
 
 - [ ] Create docker-compose.yml with all 5 services (4 MCP servers + agent)
 - [ ] Configure internal networking between containers (Planning\#4)
-- [ ] Add Redis container for caching as specified in Planning\#3
+- [ ] Add Redis container for caching as specified in Planning\#3(will be implemnted later, not at this stage)
 - [ ] Set up volume mounts for development hot-reload
 - [ ] Configure environment variable passing from .env file
 - [ ] Add health checks for all services with proper timeouts
