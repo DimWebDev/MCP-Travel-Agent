@@ -40,9 +40,10 @@ import time
 import logging
 from math import asin, cos, radians, sin, sqrt
 from typing import Any, Dict, List, Literal
+import os
 
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 
@@ -318,4 +319,4 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8002)

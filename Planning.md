@@ -65,6 +65,8 @@
 - **Code Quality:** Black, isort, mypy (Python), ESLint, Prettier (TypeScript)
 - **Containerization:** Docker with multi-stage builds
 - **Development Environment:** Docker Compose for local orchestration
+
+> **Note:** For local development and integration testing, you can use `run_all_servers.py` to start all MCP servers in parallel without Docker. This is for developer convenience only; Docker Compose will be the standard for full-stack and production workflows.
 - **Process Management:** uvicorn for FastAPI, npm scripts for React
 
 
