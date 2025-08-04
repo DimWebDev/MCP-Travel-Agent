@@ -58,16 +58,17 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Implement multi-language support detection for international POIs (**DEFERRED** – English only for MVP)
 
 
+
 ### Task T005: Create Trivia MCP Server
 
-- [ ] Create app/mcp_servers/trivia/server.py with DuckDuckGo API wrapper (PRD\#4.4)
-- [ ] Implement instant answer extraction and fact discovery logic
-- [ ] Add source reliability scoring and content filtering
-- [ ] Create TriviaRequest and TriviaResponse Pydantic models
-- [ ] Implement context matching for travel-relevant facts
-- [ ] Annotate function with `@mcp.tool()` from FastMCP
-- [ ] Write unit tests with mocked DuckDuckGo API responses
-- [ ] Create Dockerfile and test with sample topic queries
+- [x] Create app/mcp_servers/trivia/server.py with DuckDuckGo API wrapper (PRD#4.4)
+- [x] Implement instant answer extraction and fact discovery logic
+- [x] Add source reliability scoring and content filtering
+- [x] Create TriviaRequest and TriviaResponse Pydantic models
+- [x] Implement context matching for travel-relevant facts
+- [x] Annotate function with `@mcp.tool()` from FastMCP
+- [x] Write unit tests with mocked DuckDuckGo API responses
+- [x] Create Dockerfile and test with sample topic queries
 
 
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
