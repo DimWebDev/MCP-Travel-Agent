@@ -170,6 +170,7 @@ poetry run python app/mcp_servers/poi_discovery/server.py
 
 Leave that running.
 
+
 In a second terminal, start the Inspector for the POI Discovery server:
 
 ```bash
@@ -192,6 +193,25 @@ In a second terminal, start the Inspector for the Wikipedia server:
 
 ```bash
 poetry run mcp dev app/mcp_servers/wikipedia/server.py
+```
+
+---
+
+
+**To run with the Trivia server, use these analogous commands:**
+
+In one terminal, start the **Trivia MCP server**:
+
+```bash
+poetry run python app/mcp_servers/trivia/server.py
+```
+
+Leave that running.
+
+In a second terminal, start the Inspector for the Trivia server:
+
+```bash
+poetry run mcp dev app/mcp_servers/trivia/server.py
 ```
 
 ---
