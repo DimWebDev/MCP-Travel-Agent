@@ -54,7 +54,7 @@ async def test_live_get_trivia_inspect():
     """
     End-to-end integration test + inspection for 'get_trivia'.
     """
-    server_url = "http://127.0.0.1:8000/mcp"
+    server_url = "http://127.0.0.1:8004/mcp"
 
     # 1. Establish the streamable-HTTP transport
     async with streamablehttp_client(server_url) as (read, write, _):

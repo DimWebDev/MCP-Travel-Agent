@@ -106,7 +106,7 @@ README.md                     ← you are here
 
 ```bash
 # Hot-reload backend while editing
-poetry run uvicorn app.agent.main:app --reload
+ poetry run uvicorn app.main:app --reload
 
 # Unit / integration tests
 poetry run pytest
@@ -319,7 +319,7 @@ You can experiment freely—try edge cases, test error handling, and see progres
 
 ```bash
 # Hot-reload backend while editing
-poetry run uvicorn app.agent.main:app --reload
+ poetry run uvicorn app.main:app --reload
 
 # Unit tests (all MCP servers)
 poetry run pytest tests/unit
@@ -355,7 +355,7 @@ poetry run pytest tests/integration/test_live_wikipedia.py -s
 
 ```bash
 # 1. Start the full FastAPI orchestrator (which connects to all MCP servers)
-poetry run uvicorn app.agent.main:app --reload
+poetry run uvicorn app.main:app --reload
 
 # 2. Run comprehensive system tests
 poetry run pytest tests/integration/ -s
@@ -435,3 +435,28 @@ curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d 
 ```
 
 These will test the full orchestration pipeline: geocoding, POI discovery, Wikipedia, and trivia. For best results, use simple location names as queries. Complex travel planning queries will be supported in later tasks with GPT-4o-mini integration.
+
+#### For pretty-printed JSON output (recommended for local development):
+
+> **Before running the curl command below, make sure you have started all MCP servers locally:**
+> 
+> ```bash
+> poetry run python run_all_servers.py
+> ```
+> 
+> Then, in a separate terminal, start the FastAPI orchestrator:
+> 
+> ```bash
+> poetry run uvicorn app.main:app --reload
+> ```
+> 
+> Once both are running, you can test the orchestrator endpoint:
+
+```bash
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}' | jq
+```
+
+> **Tip:** [`jq`](https://stedolan.github.io/jq/) is a command-line JSON processor that formats and colors output for easier reading. Install it on macOS with:
+> ```bash
+> brew install jq
+> ```
