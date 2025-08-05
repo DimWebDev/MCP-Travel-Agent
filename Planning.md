@@ -2,27 +2,28 @@
 
 ## 1. Overview
 
-**Project Vision:** Build an intelligent AI travel agent that demonstrates advanced MCP (Model Context Protocol) orchestration patterns through dynamic tool selection and multi-step reasoning for personalized travel planning.
+**Project Vision:** Build an intelligent AI travel agent that demonstrates MCP (Model Context Protocol) orchestration patterns through a structured, multi-step workflow for personalized travel planning. The MVP agent coordinates a fixed sequence of MCP protocol calls (geocoding → POI → Wikipedia) for each user query. Dynamic tool selection and agent autonomy are future goals, not part of the current implementation.
+
 
 **Core Goals:**
 
-* Demonstrate AI agent decision-making for contextual tool selection
-* Implement multi-step reasoning chains across distributed MCP servers
+* Demonstrate MCP protocol-driven agent coordination of a structured, multi-step workflow
+* Implement multi-step reasoning chains across distributed MCP servers (fixed workflow for MVP)
 * Showcase error recovery and graceful degradation in agent workflows
 * Provide hands-on learning with MCP orchestration patterns
 
-**High-Level Roadmap:** 5-week sprint-based development focusing on the 20% of agent orchestration features that deliver 80% of learning value, progressing from basic tool communication to sophisticated agent reasoning.
+
+**High-Level Roadmap:** 5-week sprint-based development focusing on the 20% of agent orchestration features that deliver 80% of learning value, progressing from basic protocol-driven tool communication (fixed workflow) to more sophisticated agent reasoning in future phases.
 
 > **Note:** This Planning document builds directly on the requirements and goals defined in `PRD.md`. It translates those requirements into actionable architecture, technology choices, and implementation phases.
 
 ---
 
+
 **MCP Orchestration vs. Traditional Function Calling**
 
 > **Critical Design Principle:**
-> All MCP tool servers dynamically expose their capabilities to the agent at runtime via the MCP protocol.
-> The agent *discovers* and selects tools based on real-time introspection of available MCP endpoints—**not** by invoking hardcoded or predetermined functions.
-> This is foundational for the architecture and for all agent orchestration and workflow design decisions in this project.
+> The MVP agent coordinates a fixed, protocol-driven workflow by calling independent MCP servers in a set sequence (geocoding → POI → Wikipedia) for each user query. All tool invocations use the MCP protocol, not direct function calls. Dynamic tool selection and agent autonomy are future enhancements, not part of the current implementation. This is foundational for the architecture and for all agent orchestration and workflow design decisions in this project.
 
 ---
 
@@ -30,8 +31,8 @@
 
 | Milestone/Phase                  | Description                                                   | Target Date | Key Deliverables                                                   |
 | :------------------------------- | :------------------------------------------------------------ | :---------- | :----------------------------------------------------------------- |
-| **Sprint 1: Foundation**         | MCP server infrastructure & basic agent-tool communication    | Week 1      | 4 MCP servers, basic agent client, tool connectivity               |
-| **Sprint 2: Agent Intelligence** | Implement core agent decision-making for tool selection       | Week 2      | Intent classification, dynamic tool selection, basic orchestration |
+| **Sprint 1: Foundation**         | MCP server infrastructure & basic agent-tool communication    | Week 1      | 3 MCP servers, basic agent client, tool connectivity               |
+| **Sprint 2: Agent Intelligence** | Implement core agent intent analysis and structured workflow orchestration | Week 2      | Intent analysis, structured workflow orchestration, result synthesis |
 | **Sprint 3: Orchestration**      | Contextual tool chaining and intelligent result synthesis     | Week 3      | Multi-step workflows, result fusion, contextual responses          |
 | **Sprint 4: Resilience**         | Error handling, fallback strategies, and graceful degradation | Week 4      | Error recovery, retry logic, alternative tool paths                |
 | **Sprint 5: Enhancement**        | Conversation memory, follow-up handling, and optimization     | Week 5      | Context retention, conversation state, performance tuning          |
@@ -43,7 +44,7 @@
 
 * **AI Agent Framework:** Python 3.11+ with asyncio for concurrent MCP server orchestration
 - **LLM Integration:** OpenAI GPT-4o-mini via official `openai` Python library for decision-making and orchestration
-- **MCP Protocol:** Dynamic tool discovery and invocation via MCP client-server communication
+- **MCP Protocol:** Structured workflow coordination via MCP client-server communication
 * **MCP Implementation:** Python MCP SDK (`fastmcp` package) for server creation and client orchestration
 * **Backend Framework:** FastAPI with async support for agent API endpoints and MCP server hosting
 * **HTTP Client:** `httpx` for async external API calls to OSM and Wikipedia
@@ -80,10 +81,9 @@
 
 ### Architecture Overview
 
+
 **Distributed MCP Server Orchestration:**
-GPT-4o-mini agent acts as intelligent, protocol-driven coordinator across specialized MCP servers, each handling domain-specific APIs and data sources.
-**Each MCP server declares its available tools at runtime via the MCP protocol.** The agent queries this registry, discovers tool capabilities dynamically, and selects and combines tools according to user context and intent.
-This dynamic, protocol-driven discovery and orchestration enables extensibility and true agent autonomy not achievable with static function-calling approaches.
+The MVP agent acts as a protocol-driven coordinator across specialized MCP servers, each handling domain-specific APIs and data sources. For each user query, the agent always follows the same structured workflow: geocoding, then POI search, then Wikipedia enrichment. Each MCP server exposes its tool(s) via the MCP protocol, and the agent invokes them in a fixed sequence. Dynamic tool selection and agent autonomy are planned for future phases, but are not part of the current implementation. This protocol-driven orchestration enables extensibility and future autonomy not achievable with static function-calling approaches.
 
 ### Component Tree & Mapping
 
@@ -97,8 +97,8 @@ MCP Travel Agent System
 │
 ├── FastAPI Backend + GPT-4o-mini Agent Orchestrator
 │   ├── Intent Classification Engine → PRD: Natural Language Processing
-│   ├── Tool Selection Logic → PRD: Agent Decision Making  
-│   ├── Workflow Coordination → PRD: Multi-Step Reasoning
+│   ├── Workflow Coordination → PRD: Structured Travel Planning
+│   ├── Intent Analysis Engine → PRD: User Preference Interpretation
 │   ├── Error Recovery Handler → PRD: Error Recovery
 │   ├── Response Synthesis → PRD: Dynamic Result Synthesis
 │   └── Conversation Memory Store → PRD: User Preference Memory
@@ -273,8 +273,8 @@ Agent Behavior Validation → Merge to Main
 
 ### Success Metrics Tracking
 
-* **Agent Autonomy:** ≥90% correct tool selection in standardized test scenarios
-* **Contextual Adaptation:** ≥80% appropriate behavior variation based on user intent categories
+* **MCP Protocol Mastery:** ≥95% successful workflow coordination in standardized test scenarios
+* **Intent Analysis Quality:** ≥80% accurate user preference extraction
 * **Error Recovery:** ≥75% graceful degradation during simulated API failures
 * **Performance:** <3 second average response time for simple queries, <10 seconds for complex multi-tool workflows
 * **Learning Documentation:** Comprehensive capture of MCP orchestration patterns for knowledge transfer
