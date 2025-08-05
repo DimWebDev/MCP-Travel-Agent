@@ -1,6 +1,9 @@
 # Tasks.md
 
-##Step-by-Step Implementation
+> **MCP Orchestration Principle**
+>All tasks must use dynamic, protocol-driven tool discovery. The agent must discover and invoke tools via the MCP protocol at runtime—no hardcoded function calls.
+
+\#\#Step-by-Step Implementation
 
 For each major feature or milestone, break down the implementation into clear, sequential steps. Reference PRD and Planning sections for context.
 
@@ -28,10 +31,9 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Test server manually with sample location queries
 
 
-
 ### Task T003: Create POI Discovery MCP Server
 
-- [x] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD#4.2)
+- [x] Create app/mcp_servers/poi_discovery/server.py with Overpass API wrapper (PRD\#4.2)
 - [x] Implement category mappings (tourism, historic, restaurant, entertainment, shopping)
 - [x] Build Overpass QL query generator for different POI categories
 - [x] Add result filtering and ranking logic based on distance.
@@ -41,16 +43,16 @@ For each major feature or milestone, break down the implementation into clear, s
 - [x] Create Dockerfile and test with sample coordinate queries
 
 
-
 ### Task T004: Create Wikipedia MCP Server
 
-- [x] Create app/mcp_servers/wikipedia/server.py with Wikipedia API wrapper (PRD#4.3)
+- [x] Create app/mcp_servers/wikipedia/server.py with Wikipedia API wrapper (PRD\#4.3)
 - [x] Implement content extraction and summarization logic
-- [x] Add rate limiting (5000 req/hour) as specified in Planning#5
+- [x] Add rate limiting (5000 req/hour) as specified in Planning\#5
 - [x] Create WikipediaRequest and WikipediaResponse Pydantic models
 - [x] Annotate function with `@mcp.tool()` from FastMCP
 - [x] Write unit tests with mocked Wikipedia API responses
 - [x] Create Dockerfile and test with sample POI name queries
+
 
 #### Task T004-extra: Wikipedia MCP Server Extras
 
@@ -58,61 +60,48 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Implement multi-language support detection for international POIs (**DEFERRED** – English only for MVP)
 
 
-
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
 
 > **Dev Note:** During local development, agent orchestration and integration can be tested by running all MCP servers in parallel with `run_all_servers.py`. This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 
- - [x] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
- - [x] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
- - [x] Implement MCP client connections to all 3 servers (Planning#4 architecture)
- - [x] Create agent request/response models with Pydantic validation
- - [x] Add health check endpoints for all MCP servers
- - [x] Configure CORS middleware for React frontend integration (Planning#3)
- - [x] Implement structured logging for agent decisions and tool calls
- - [x] Add basic error handling and timeout management
- - [x] Test agent-to-MCP-server communication with sample requests
+- [x] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
+- [x] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
+- [x] Implement MCP client connections to all 3 servers (Planning\#4 architecture)
+- [x] Create agent request/response models with Pydantic validation
+- [x] Add health check endpoints for all MCP servers
+- [x] Configure CORS middleware for React frontend integration (Planning\#3)
+- [x] Implement structured logging for agent decisions and tool calls
+- [x] Add basic error handling and timeout management
+- [x] Test agent-to-MCP-server communication with sample requests
+
 
 ### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
 
 - **Dependencies:** Requires T002 (Geocoding) and T003 (POI Discovery) to be completed
-- Add logic in the orchestrator so that every call to `search_pois` carries a sensible `radius` 
-  based on:
-  - Urban vs rural density (using the geocoding result)
-  - POI category (e.g. ≤800 m for restaurants, 2 km for attractions)
-  - User intent keywords (e.g. "nearby", "around")
+- Add logic in the orchestrator so that every call to `search_pois` carries a sensible `radius`
+based on:
+    - Urban vs rural density (using the geocoding result)
+    - POI category (e.g. ≤800 m for restaurants, 2 km for attractions)
+    - User intent keywords (e.g. "nearby", "around")
 - Ensure this defaulting is unit-tested.
-- Update the FastAPI endpoint Pydantic model to accept an optional `radius` (with `None` default), 
-  and fill in the orchestrated default before calling the MCP server.
+- Update the FastAPI endpoint Pydantic model to accept an optional `radius` (with `None` default),
+and fill in the orchestrated default before calling the MCP server.
 - Document the policy in code comments and in the OpenAPI schema (so it shows up in `/docs`).
 
 
-
-### Task T007: Set Up Docker Compose Development Environment
-
-- [ ] Create docker-compose.yml with all 4 services (3 MCP servers + agent)
-- [ ] Configure internal networking between containers (Planning\#4)
-- [ ] Add Redis container for caching as specified in Planning\#3(will be implemnted later, not at this stage)
-- [ ] Set up volume mounts for development hot-reload
-- [ ] Configure environment variable passing from .env file
-- [ ] Add health checks for all services with proper timeouts
-- [ ] Create startup script for development environment
-- [ ] Test full environment startup and verify service discovery
-
-
-### Task T008: Implement GPT-4o-mini Integration with Function Calling
+### Task T007: Implement GPT-4o-mini Integration with MCP Tool Orchestration
 
 - [ ] Install and configure OpenAI Python library with API key handling
-- [ ] Create GPT-4o-mini client following Planning\#3 specifications
-- [ ] Implement function calling schema for all 3 MCP tools (PRD\#4)
+- [ ] Create GPT-4o-mini client for natural language processing and decision making
+- [ ] Implement MCP tool invocation logic for all 3 MCP servers (geocoding, POI, Wikipedia)
+- [ ] Create MCP client connections to communicate with MCP servers
 - [ ] Add conversation context management and memory
-- [ ] Implement token usage monitoring as specified in Planning\#6 risks
-- [ ] Add retry logic with exponential backoff for API failures
-- [ ] Create unit tests with mocked OpenAI responses
-- [ ] Add cost tracking and usage limits to prevent overruns
+- [ ] Implement tool selection logic based on AI model responses
+- [ ] Add MCP protocol error handling and retry logic
+- [ ] Create unit tests with mocked MCP server responses
 
 
-### Task T009: Create Intent Classification Logic
+### Task T008: Create Intent Classification Logic
 
 - [ ] Design user intent categories (historical, food, family, budget) from PRD\#2 user stories
 - [ ] Implement prompt engineering for GPT-4o-mini intent extraction
@@ -124,7 +113,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Document intent classification patterns for future enhancement
 
 
-### Task T010: Build Dynamic Tool Selection Engine
+### Task T009: Build Dynamic Tool Selection Engine
 
 - [ ] Implement tool selection logic based on classified user intents (PRD\#3)
 - [ ] Create decision tree for single vs multi-tool execution patterns
@@ -136,7 +125,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Validate ≥90% tool selection accuracy as specified in PRD\#7
 
 
-### Task T011: Implement Basic Agent Decision-Making Tests
+### Task T010: Implement Basic Agent Decision-Making Tests
 
 - [ ] Create automated test scenarios for all user stories from PRD\#2
 - [ ] Implement tool selection accuracy testing with standardized inputs
@@ -148,7 +137,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Validate core MCP learning objectives from PRD\#1 are demonstrable
 
 
-### Task T012: Build Multi-Step Workflow Coordination
+### Task T011: Build Multi-Step Workflow Coordination
 
 - [ ] Implement workflow orchestration engine for tool chaining (PRD\#5.2)
 - [ ] Create dependency management between sequential tool calls
@@ -160,7 +149,7 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Document common workflow patterns for knowledge transfer
 
 
-### Task T013: Implement Contextual Result Synthesis
+### Task T012: Implement Contextual Result Synthesis
 
 - [ ] Create result aggregation logic for combining multiple tool outputs (PRD\#3)
 - [ ] Implement intelligent response generation using GPT-4o-mini synthesis
@@ -172,12 +161,24 @@ For each major feature or milestone, break down the implementation into clear, s
 - [ ] Validate response synthesis meets user story expectations from PRD\#2
 
 
+### Task T013: Set Up Docker Compose Development Environment
+
+- [ ] Create docker-compose.yml with all 4 services (3 MCP servers + agent)
+- [ ] Configure internal networking between containers (Planning\#4)
+- [ ] Add Redis container for caching as specified in Planning\#3(will be implemnted later, not at this stage)
+- [ ] Set up volume mounts for development hot-reload
+- [ ] Configure environment variable passing from .env file
+- [ ] Add health checks for all services with proper timeouts
+- [ ] Create startup script for development environment
+- [ ] Test full environment startup and verify service discovery
+
+
 ### Task T014: Create React TypeScript Chat Interface
 
 - [ ] Set up Vite + React + TypeScript project following Planning\#3 frontend stack
 - [ ] Install and configure Tailwind CSS and Headless UI components
 - [ ] Create chat message components with proper TypeScript interfaces
-- [ ] Implement streaming with **fetch() & ReadableStream over `/mcp` (Streamable HTTP)**; keep SSE adapter for legacy
+- [ ] Implement streaming with **fetch() \& ReadableStream over `/mcp` (Streamable HTTP)**; keep SSE adapter for legacy
 - [ ] Add conversation history display using Zustand state management
 - [ ] Create loading states, error boundaries, and user feedback mechanisms
 - [ ] Add responsive design for mobile and desktop viewports

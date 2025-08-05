@@ -1,13 +1,13 @@
 # Product Requirements Document: MCP-Orchestrated AI Travel Agent
 
 **Main Takeaway:**  
-Build an intelligent AI travel agent that uses Model Context Protocol 
+Build an intelligent AI travel agent that uses Model Context Protocol tools to orchestrate itinerary generation. An AI agent (GPT-4o-mini) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap and Wikipedia into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
 
-**Backend Framework:** FastMCP servers with MCP tool integration
-**AI Agent:** GPT-4ο-mini via API with function calling
-**MCP Implementation:** Python MCP SDK for tool creation
-**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
-**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (GPT-4o-mini) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap and Wikipedia into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
+**Backend Framework:** FastMCP servers with MCP tool integration  
+**AI Agent:** GPT-4ο-mini via API with MCP orchestration (not traditional function calling)  
+**MCP Implementation:** Python MCP SDK for tool creation  
+**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)  
+**Data Storage:** In-memory conversation state (no database required for MVP)
 
 ## 1. Objective and Scope  
 
@@ -23,6 +23,23 @@ Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent to
 - `geocode_tool` - wraps OSM Nominatim for location resolution
 - `poi_search_tool` - wraps Overpass API for point-of-interest discovery
 - `wikipedia_lookup_tool` - wraps Wikipedia APIs for detailed descriptions
+
+## 1.1 MCP Protocol vs Traditional Function Calling
+
+**Critical Architecture Distinction:** This system uses **MCP (Model Context Protocol)** for dynamic tool discovery and orchestration, NOT predetermined function calling.
+
+**How MCP Works:**
+1. **Tool Discovery:** MCP servers automatically inform the orchestrator about available tools and their capabilities
+2. **Dynamic Selection:** The AI agent analyzes user queries and dynamically selects which exposed tools to invoke
+3. **Protocol Communication:** Tools are executed via MCP protocol calls to independent servers
+4. **Flexible Orchestration:** The agent can discover and use new tools without code changes
+
+**MCP Flow:**
+```
+User Query → AI Analysis → Dynamic Tool Discovery → MCP Protocol Calls → Result Synthesis
+```
+
+**Key Advantage:** Unlike traditional function calling where tools are hardcoded, MCP servers expose their capabilities dynamically, allowing the orchestrator to make intelligent decisions about which tools to use based on real-time analysis of user intent.
 
 ## 2. User Stories (Natural Language Interaction)
 
@@ -100,41 +117,55 @@ if __name__ == "__main__":
 ## 5. Agent Orchestration Architecture
 
 ### 5.1 Agent System Design
-The core system centers around an **AI Agent Controller** that receives natural language requests and orchestrates MCP tool usage:
+The core system centers around an **AI Agent Controller** that receives natural language requests and orchestrates MCP tool usage through dynamic discovery:
 
 ```python
 class TravelAgent:
-    def __init__(self, llm_client, mcp_tools):
-        self.llm = llm_client  # Claude, GPT-4, etc.
-        self.tools = mcp_tools
+    def __init__(self, llm_client, mcp_clients):
+        self.llm = llm_client  # GPT-4o-mini for decision making
+        self.mcp_clients = mcp_clients  # MCP client connections to tool servers
         self.conversation_memory = []
+        self.available_tools = {}  # Dynamically discovered from MCP servers
+    
+    async def discover_available_tools(self):
+        """MCP servers inform orchestrator of their exposed tools"""
+        for client in self.mcp_clients:
+            tools = await client.list_tools()  # MCP protocol call
+            self.available_tools.update(tools)
     
     async def process_request(self, user_request: str) -> str:
-        # Agent analyzes request and decides tool usage strategy
-        response = await self.llm.generate(
-            system_prompt=TRAVEL_AGENT_PROMPT,
-            user_input=user_request,
-            tools=self.tools,
-            conversation_history=self.conversation_memory
+        # AI agent analyzes request against dynamically discovered tools
+        tool_selection = await self.llm.analyze_and_select_tools(
+            user_request, 
+            self.available_tools,  # Tools exposed by MCP servers
+            self.conversation_memory
         )
-        return response
+        
+        # Execute selected tools via MCP protocol
+        results = await self.orchestrate_mcp_calls(tool_selection)
+        
+        # AI synthesizes results into response
+        return await self.llm.synthesize_response(results, user_request)
 ```
 
 ### 5.2 Agent Decision Flow
-1. **Intent Analysis:** Agent interprets user preferences (history, food, family, budget, etc.)
-2. **Tool Selection:** Agent decides which tools to invoke and in what sequence
-3. **Contextual Execution:** Agent calls tools with parameters informed by user context
-4. **Quality Assessment:** Agent evaluates tool results and decides whether to refine searches
-5. **Synthesis:** Agent combines information into personalized, coherent recommendations
-6. **Memory Update:** Agent retains context for follow-up questions
+1. **Tool Discovery:** Agent queries MCP servers to learn what tools are available
+2. **Intent Analysis:** Agent interprets user preferences (history, food, family, budget, etc.)
+3. **Dynamic Tool Selection:** Agent decides which discovered tools to invoke based on user context
+4. **MCP Protocol Execution:** Agent calls selected tools via MCP protocol communication
+5. **Quality Assessment:** Agent evaluates tool results and decides whether to invoke additional tools
+6. **Synthesis:** Agent combines information into personalized, coherent recommendations
+7. **Memory Update:** Agent retains context for follow-up questions
 
 ### 5.3 Example Agent Reasoning Process
 **User:** "Plan a romantic evening in Paris"
 
 **Agent Reasoning:**
-- *Intent:* Romantic activities, evening timing, Paris location
-- *Tool Strategy:* Geocode Paris → Search romantic venues (restaurants, viewpoints) → Get Wikipedia context for ambiance
-- *Synthesis:* Combine into evening itinerary with romantic narrative
+- *Tool Discovery:* Query MCP servers → Discover geocoding, POI search, and Wikipedia tools available
+- *Intent Analysis:* Romantic activities, evening timing, Paris location
+- *Dynamic Tool Selection:* Based on available tools, select geocoding → POI search (restaurants/viewpoints) → Wikipedia (ambiance context)
+- *MCP Orchestration:* Execute tool sequence via MCP protocol calls to respective servers
+- *Synthesis:* Combine MCP tool results into evening itinerary with romantic narrative
 
 ## 6. Implementation Milestones
 
@@ -156,20 +187,21 @@ class TravelAgent:
 
 ## 8. Technical Stack (Minimal Complexity)
 
-**Backend Framework:** FastAPI with MCP tool integration
-**AI Agent:** Claude-3.5 or GPT-4 via API with function calling
-**MCP Implementation:** Python MCP SDK for tool creation
-**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
+**Backend Framework:** FastAPI with MCP tool integration  
+**AI Agent:** Claude-3.5 or GPT-4 via API with MCP orchestration  
+**MCP Implementation:** Python MCP SDK for tool creation  
+**MCP Protocol:** Dynamic tool discovery and invocation (not predetermined function calls)  
+**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)  
 **Data Storage:** In-memory conversation state (no database required for MVP)
 
 ## 9. Key Differentiators from Traditional PRD
 
 This MCP-based approach fundamentally differs from traditional web applications:
 
-**Traditional Approach:** User input → Predetermined API sequence → Fixed response format
-**MCP Orchestration:** User input → Agent analysis → Dynamic tool selection → Contextual synthesis → Personalized response
+**Traditional Function Calling:** User input → Predetermined function sequence → Fixed response format  
+**MCP Orchestration:** User input → Tool discovery from MCP servers → AI analysis → Dynamic tool selection → MCP protocol execution → Contextual synthesis → Personalized response
 
-The agent becomes the intelligent orchestrator that makes contextual decisions, handles uncertainty, and provides natural language interaction. This design prioritizes learning agent orchestration patterns over building a polished travel application.
+The agent becomes the intelligent orchestrator that dynamically discovers available tools from MCP servers, makes contextual decisions about which tools to invoke, and handles uncertainty through flexible protocol communication. This design prioritizes learning agent orchestration patterns over building a polished travel application.
 
 ## 10. Future MCP Enhancements (Beyond 80/20)
 
