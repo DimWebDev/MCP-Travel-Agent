@@ -29,20 +29,16 @@ class AgentOrchestrator:
     async def handle_query(self, query: str) -> AgentResponse:
         """Process a user query by invoking multiple MCP tools.
 
-        Basic orchestration workflow for Task T006:
+        Workflow:
             1. Geocode the query to obtain coordinates (PRD.md §4.1)
             2. Use coordinates to search for POIs (PRD.md §4.2)
             3. Fetch Wikipedia info (PRD.md §4.3)
             4. Retrieve trivia facts (PRD.md §4.4)
-            
-        Note: Intelligent query parsing will be added in Task T008-T009 with GPT-4o-mini
         """
 
         self.logger.info("handle_query", extra={"query": query})
         results: list[ToolResult] = []
 
-        # For now, assume the query is a simple location name for geocoding
-        # TODO: Task T008-T009 will add GPT-4o-mini intent classification and location extraction
         try:
             geocode_data = await asyncio.wait_for(
                 self.clients["geocoding"].call({"location_name": query}),
@@ -56,9 +52,8 @@ class AgentOrchestrator:
         if geocode_data and {"lat", "lon"} <= geocode_data.keys():
             try:
                 poi_payload = {
-                    "latitude": geocode_data["lat"],
-                    "longitude": geocode_data["lon"],
-                    "category": "tourism"
+                    "lat": geocode_data["lat"],
+                    "lon": geocode_data["lon"],
                 }
                 poi_data = await asyncio.wait_for(
                     self.clients["poi"].call(poi_payload), timeout=self.timeout
@@ -101,19 +96,19 @@ def create_orchestrator() -> AgentOrchestrator:
 
     clients = {
         "geocoding": MCPClient(
-            os.getenv("GEOCODING_SERVER_URL", "http://127.0.0.1:8001/mcp"),
+            os.getenv("GEOCODING_SERVER_URL", "http://127.0.0.1:8000/mcp"),
             "geocode_location",
         ),
         "poi": MCPClient(
-            os.getenv("POI_SERVER_URL", "http://127.0.0.1:8002/mcp"),
+            os.getenv("POI_SERVER_URL", "http://127.0.0.1:8001/mcp"),
             "search_pois",
         ),
         "wikipedia": MCPClient(
-            os.getenv("WIKIPEDIA_SERVER_URL", "http://127.0.0.1:8003/mcp"),
+            os.getenv("WIKIPEDIA_SERVER_URL", "http://127.0.0.1:8002/mcp"),
             "get_wikipedia_info",
         ),
         "trivia": MCPClient(
-            os.getenv("TRIVIA_SERVER_URL", "http://127.0.0.1:8004/mcp"),
+            os.getenv("TRIVIA_SERVER_URL", "http://127.0.0.1:8003/mcp"),
             "get_trivia",
         ),
     }

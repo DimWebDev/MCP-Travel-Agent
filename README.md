@@ -417,33 +417,7 @@ The `-s` flag disables pytest's output capture so you see all debug information,
 
 You can verify your MCP agent and all microservices are working with these commands:
 
-### Individual MCP Server Testing (Recommended for Development)
-
-First, start all MCP servers locally:
-```bash
-poetry run python run_all_servers.py
-```
-
-Then run integration tests for each server:
-```bash
-# Test all integration tests at once
-poetry run pytest tests/integration/ -v
-
-# Or test individual servers:
-poetry run pytest tests/integration/test_live_geocode.py -s      # Port 8001
-poetry run pytest tests/integration/test_live_poi_discovery.py -s # Port 8002
-poetry run pytest tests/integration/test_live_wikipedia.py -s    # Port 8003
-poetry run pytest tests/integration/test_live_trivia.py -s       # Port 8004
-```
-
-### Full System Testing via Orchestrator
-
-Start the FastAPI orchestrator:
-```bash
-poetry run uvicorn app.agent.main:app --reload
-```
-
-#### Health checks (all should return `{"status":"ok"}`)
+### Health checks (all should return `{\"status\":\"ok\"}`)
 
 ```bash
 curl http://localhost:8000/health/geocoding
@@ -452,7 +426,7 @@ curl http://localhost:8000/health/wikipedia
 curl http://localhost:8000/health/trivia
 ```
 
-#### Simple location queries (the scope of Task T006)
+### Simple location queries (the scope of Task T006)
 
 ```bash
 curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}'

@@ -55,7 +55,7 @@ async def test_live_geocode_location_inspect():
     """
     End-to-end integration test + inspection for 'geocode_location'.
     """
-    server_url = "http://127.0.0.1:8001/mcp"
+    server_url = "http://127.0.0.1:8000/mcp"
 
     # 1. Establish the streamable-HTTP transport
     async with streamablehttp_client(server_url) as (read, write, _):
