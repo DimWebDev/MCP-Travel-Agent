@@ -225,10 +225,9 @@ def _extract_fact_relaxed(candidates: list[Tuple[str, str, str]], request: Trivi
 # MCP Tool Implementation
 # ---------------------------------------------------------------------------
 
-@mcp.tool()
-async def get_trivia(request: TriviaRequest) -> TriviaResponse:
+async def _get_trivia_impl(request: TriviaRequest) -> TriviaResponse:
     """
-    Fetch travel-related trivia using DuckDuckGo Instant Answer API.
+    Implementation of travel-related trivia fetching using DuckDuckGo Instant Answer API.
 
     WORKFLOW:
     1. Fetch data from DuckDuckGo with rate limiting
@@ -257,6 +256,16 @@ async def get_trivia(request: TriviaRequest) -> TriviaResponse:
         raise RuntimeError("Low reliability source")
 
     return TriviaResponse(trivia=fact, source=source, url=url or None, reliability=reliability)
+
+
+@mcp.tool()
+async def get_trivia(request: TriviaRequest) -> TriviaResponse:
+    """
+    Fetch travel-related trivia using DuckDuckGo Instant Answer API.
+    
+    This is the MCP tool wrapper that delegates to the implementation function.
+    """
+    return await _get_trivia_impl(request)
 
 # ---------------------------------------------------------------------------
 # Entrypoint

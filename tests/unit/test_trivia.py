@@ -34,7 +34,7 @@ async def test_trivia_success(monkeypatch):
     monkeypatch.setattr(server, "fetch_duckduckgo", mock_fetch)
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
-    result = await server.get_trivia(
+    result = await server._get_trivia_impl(
         TriviaRequest(topic="Eiffel Tower", context="Paris")
     )
 
@@ -61,7 +61,7 @@ async def test_trivia_low_reliability(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="Low reliability"):
-        await server.get_trivia(TriviaRequest(topic="Eiffel Tower", context="Paris"))
+        await server._get_trivia_impl(TriviaRequest(topic="Eiffel Tower", context="Paris"))
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_trivia_no_relevant_fact(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="No travel-relevant trivia"):
-        await server.get_trivia(TriviaRequest(topic="Eiffel Tower", context="Paris"))
+        await server._get_trivia_impl(TriviaRequest(topic="Eiffel Tower", context="Paris"))
 
 
 @pytest.mark.asyncio
@@ -100,4 +100,4 @@ async def test_trivia_http_error(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="DuckDuckGo API error"):
-        await server.get_trivia(TriviaRequest(topic="Eiffel Tower"))
+        await server._get_trivia_impl(TriviaRequest(topic="Eiffel Tower"))

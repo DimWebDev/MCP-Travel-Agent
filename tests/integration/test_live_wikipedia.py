@@ -1,4 +1,3 @@
-
 """
 tests/integration/test_live_wikipedia.py
 ----------------------------------------
@@ -53,7 +52,7 @@ async def test_live_wikipedia_lookup():
     """
     End-to-end integration test for 'get_wikipedia_info'.
     """
-    server_url = "http://127.0.0.1:8000/mcp"
+    server_url = "http://127.0.0.1:8003/mcp"
 
     async with streamablehttp_client(server_url) as (read, write, _):
         async with ClientSession(read, write) as session:

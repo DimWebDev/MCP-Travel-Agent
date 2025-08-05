@@ -33,7 +33,6 @@ class AgentOrchestrator:
             1. Geocode the query to obtain coordinates (PRD.md §4.1)
             2. Use coordinates to search for POIs (PRD.md §4.2)
             3. Fetch Wikipedia info (PRD.md §4.3)
-            4. Retrieve trivia facts (PRD.md §4.4)
         """
 
         self.logger.info("handle_query", extra={"query": query})
@@ -52,8 +51,8 @@ class AgentOrchestrator:
         if geocode_data and {"lat", "lon"} <= geocode_data.keys():
             try:
                 poi_payload = {
-                    "lat": geocode_data["lat"],
-                    "lon": geocode_data["lon"],
+                    "latitude": geocode_data["lat"],
+                    "longitude": geocode_data["lon"],
                 }
                 poi_data = await asyncio.wait_for(
                     self.clients["poi"].call(poi_payload), timeout=self.timeout
@@ -62,7 +61,7 @@ class AgentOrchestrator:
             except Exception as exc:  # pragma: no cover - error path
                 self.logger.error("poi search failed", extra={"error": str(exc)})
 
-        # Wikipedia and Trivia run in parallel since they don't depend on each other
+        # Wikipedia can run in parallel since it doesn't depend on others
         async def call_optional(name: str, payload: Dict[str, object]):
             try:
                 data = await asyncio.wait_for(
@@ -76,7 +75,6 @@ class AgentOrchestrator:
 
         await asyncio.gather(
             call_optional("wikipedia", {"poi_name": query}),
-            call_optional("trivia", {"topic": query}),
         )
 
         return AgentResponse(results=results)
@@ -96,20 +94,16 @@ def create_orchestrator() -> AgentOrchestrator:
 
     clients = {
         "geocoding": MCPClient(
-            os.getenv("GEOCODING_SERVER_URL", "http://127.0.0.1:8000/mcp"),
+            os.getenv("GEOCODING_SERVER_URL", "http://127.0.0.1:8001/mcp"),
             "geocode_location",
         ),
         "poi": MCPClient(
-            os.getenv("POI_SERVER_URL", "http://127.0.0.1:8001/mcp"),
+            os.getenv("POI_SERVER_URL", "http://127.0.0.1:8002/mcp"),
             "search_pois",
         ),
         "wikipedia": MCPClient(
-            os.getenv("WIKIPEDIA_SERVER_URL", "http://127.0.0.1:8002/mcp"),
+            os.getenv("WIKIPEDIA_SERVER_URL", "http://127.0.0.1:8003/mcp"),
             "get_wikipedia_info",
-        ),
-        "trivia": MCPClient(
-            os.getenv("TRIVIA_SERVER_URL", "http://127.0.0.1:8003/mcp"),
-            "get_trivia",
         ),
     }
     return AgentOrchestrator(clients)

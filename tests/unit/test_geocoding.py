@@ -10,6 +10,7 @@ from app.mcp_servers.geocoding.server import (
     GeocodeRequest,
     GeocodeResponse,
     RateLimiter,
+    _geocode_location_impl,  # import undecorated implementation
 )
 
 
@@ -30,7 +31,7 @@ async def test_geocode_success(monkeypatch):
     monkeypatch.setattr(server, "fetch_location", mock_fetch)
     monkeypatch.setattr(server.rate_limiter, "wait", lambda: asyncio.sleep(0))
 
-    result = await server.geocode_location(GeocodeRequest(location_name="Rome"))
+    result = await _geocode_location_impl(GeocodeRequest(location_name="Rome"))
     assert isinstance(result, GeocodeResponse)
     assert result.lat == 1.0
     assert result.lon == 2.0
@@ -46,7 +47,7 @@ async def test_geocode_not_found(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", lambda: asyncio.sleep(0))
 
     with pytest.raises(RuntimeError, match="Location not found"):
-        await server.geocode_location(GeocodeRequest(location_name="Unknown"))
+        await _geocode_location_impl(GeocodeRequest(location_name="Unknown"))
 
 
 @pytest.mark.asyncio
@@ -58,7 +59,7 @@ async def test_geocode_http_error(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", lambda: asyncio.sleep(0))
 
     with pytest.raises(RuntimeError, match="HTTP error"):
-        await server.geocode_location(GeocodeRequest(location_name="Rome"))
+        await _geocode_location_impl(GeocodeRequest(location_name="Rome"))
 
 
 @pytest.mark.asyncio
@@ -70,7 +71,7 @@ async def test_geocode_timeout(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", lambda: asyncio.sleep(0))
 
     with pytest.raises(RuntimeError, match="timed out"):
-        await server.geocode_location(GeocodeRequest(location_name="Rome"))
+        await _geocode_location_impl(GeocodeRequest(location_name="Rome"))
 
 
 @pytest.mark.asyncio

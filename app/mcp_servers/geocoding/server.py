@@ -182,6 +182,17 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
     Raises:
         RuntimeError: If geocoding fails due to network, parsing, or data issues
     """
+    return await _geocode_location_impl(request)
+
+
+async def _geocode_location_impl(request: GeocodeRequest) -> GeocodeResponse:
+    """
+    Internal implementation of geocode_location for unit testing.
+    
+    This function contains the actual geocoding logic and is used by both
+    the MCP tool wrapper and unit tests. The separation allows for proper
+    testing without MCP tool decoration complications.
+    """
     # STEP 1: Enforce rate limiting to comply with OSM usage policy
     await rate_limiter.wait()
     

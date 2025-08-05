@@ -106,7 +106,7 @@ README.md                     ← you are here
 
 ```bash
 # Hot-reload backend while editing
-poetry run uvicorn app.agent.main:app --reload
+ poetry run uvicorn app.main:app --reload
 
 # Unit / integration tests
 poetry run pytest
@@ -150,9 +150,14 @@ Happy hacking — and enjoy building your MCP-powered travel companion!
 ```
 
 
+
 ## 🚦 Checking MCP Server Health with the Inspector GUI
 
-You can verify any FastMCP server end‐to‐end by using the **MCP Inspector**—a lightweight GUI + proxy that lets you visually discover and invoke your tools without hand-crafting JSON-RPC messages.
+> **Inspector for FastMCP 2.x+**
+> 
+> For FastMCP 2.x and later, always use `poetry run fastmcp dev ...` to launch the Inspector. The legacy `mcp dev` CLI is not compatible with FastMCP 2.x servers. The built-in Inspector provides a web-based UI for tool discovery and testing.
+
+You can verify any FastMCP server end‐to‐end by using the **FastMCP Inspector**—a lightweight GUI + proxy that lets you visually discover and invoke your tools without hand-crafting JSON-RPC messages.
 
 ---
 
@@ -173,13 +178,15 @@ poetry run python app/mcp_servers/geocoding/server.py
 
 Leave that running.
 
+
 In a second terminal, start the Inspector:
 
 ```bash
-poetry run mcp dev app/mcp_servers/geocoding/server.py
+poetry run fastmcp dev app/mcp_servers/geocoding/server.py
 ```
 
 ---
+
 
 **To run with the POI Discovery server, use these analogous commands:**
 
@@ -191,14 +198,14 @@ poetry run python app/mcp_servers/poi_discovery/server.py
 
 Leave that running.
 
-
 In a second terminal, start the Inspector for the POI Discovery server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/poi_discovery/server.py
+poetry run fastmcp dev app/mcp_servers/poi_discovery/server.py
 ```
 
 ---
+
 
 **To run with the Wikipedia server, use these analogous commands:**
 
@@ -213,10 +220,11 @@ Leave that running.
 In a second terminal, start the Inspector for the Wikipedia server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/wikipedia/server.py
+poetry run fastmcp dev app/mcp_servers/wikipedia/server.py
 ```
 
 ---
+
 
 
 **To run with the Trivia server, use these analogous commands:**
@@ -232,7 +240,7 @@ Leave that running.
 In a second terminal, start the Inspector for the Trivia server:
 
 ```bash
-poetry run mcp dev app/mcp_servers/trivia/server.py
+poetry run fastmcp dev app/mcp_servers/trivia/server.py
 ```
 
 ---
@@ -311,7 +319,7 @@ You can experiment freely—try edge cases, test error handling, and see progres
 
 ```bash
 # Hot-reload backend while editing
-poetry run uvicorn app.agent.main:app --reload
+ poetry run uvicorn app.main:app --reload
 
 # Unit tests (all MCP servers)
 poetry run pytest tests/unit
@@ -347,7 +355,7 @@ poetry run pytest tests/integration/test_live_wikipedia.py -s
 
 ```bash
 # 1. Start the full FastAPI orchestrator (which connects to all MCP servers)
-poetry run uvicorn app.agent.main:app --reload
+poetry run uvicorn app.main:app --reload
 
 # 2. Run comprehensive system tests
 poetry run pytest tests/integration/ -s
@@ -355,14 +363,15 @@ poetry run pytest tests/integration/ -s
 
 ### 5.3 · MCP Inspector for Visual Testing
 
+
 For interactive testing and debugging of individual MCP servers:
 
 ```bash
 # Start your MCP server first
 poetry run python app/mcp_servers/geocoding/server.py
 
-# Then launch the MCP Inspector in another terminal
-poetry run mcp dev app/mcp_servers/geocoding/server.py
+# Then launch the FastMCP Inspector in another terminal
+poetry run fastmcp dev app/mcp_servers/geocoding/server.py
 # Opens browser UI at http://localhost:6274
 ```
 
@@ -399,3 +408,55 @@ poetry run pytest tests/integration/test_live_geocode.py -s
 
 The `-s` flag disables pytest's output capture so you see all debug information, including tool schemas and response structures.
 
+
+
+
+
+
+## 🧪 How to Test Your MCP Agent (Health & Queries) TASK006
+
+You can verify your MCP agent and all microservices are working with these commands:
+
+### Health checks (all should return `{\"status\":\"ok\"}`)
+
+```bash
+curl http://localhost:8000/health/geocoding
+curl http://localhost:8000/health/poi  
+curl http://localhost:8000/health/wikipedia
+curl http://localhost:8000/health/trivia
+```
+
+### Simple location queries (the scope of Task T006)
+
+```bash
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}' | jq
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Paris"}' | jq
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Tokyo"}' | jq
+```
+
+These will test the full orchestration pipeline: geocoding, POI discovery, Wikipedia, and trivia. For best results, use simple location names as queries. Complex travel planning queries will be supported in later tasks with GPT-4o-mini integration.
+
+#### For pretty-printed JSON output (recommended for local development):
+
+> **Before running the curl command below, make sure you have started all MCP servers locally:**
+> 
+> ```bash
+> poetry run python run_all_servers.py
+> ```
+> 
+> Then, in a separate terminal, start the FastAPI orchestrator:
+> 
+> ```bash
+> poetry run uvicorn app.main:app --reload
+> ```
+> 
+> Once both are running, you can test the orchestrator endpoint:
+
+```bash
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}' | jq
+```
+
+> **Tip:** [`jq`](https://stedolan.github.io/jq/) is a command-line JSON processor that formats and colors output for easier reading. Install it on macOS with:
+> ```bash
+> brew install jq
+> ```
