@@ -100,12 +100,16 @@ class WikipediaResponse(BaseModel):
 
 
 # FastMCP server instance and configuration
+CONTACT_EMAIL = os.getenv("MCP_CONTACT_EMAIL", "contact@example.com")
 mcp = FastMCP("Wikipedia Server")
 rate_limiter = RateLimiter(rate_per_sec=1.2)  # Conservative rate limiting
 BASE_URL = "https://en.wikipedia.org/api/rest_v1"
 HEADERS = {
-    "User-Agent": "MCP-Travel-Agent/1.0 (https://github.com/your-repo; your@email.com)",
-    "Accept": "application/json"
+    # Include contact information so Wikipedia can reach out if needed.  The
+    # email can be overridden via the ``MCP_CONTACT_EMAIL`` environment
+    # variable.
+    "User-Agent": f"MCP-Travel-Agent/1.0 ({CONTACT_EMAIL})",
+    "Accept": "application/json",
 }
 
 # Configure logging for debugging and monitoring

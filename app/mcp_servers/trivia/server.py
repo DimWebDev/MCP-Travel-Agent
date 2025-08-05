@@ -43,8 +43,11 @@ logger = logging.getLogger("trivia-server")
 logging.basicConfig(level=logging.INFO)
 
 DUCKDUCKGO_URL = "https://api.duckduckgo.com/"
+CONTACT_EMAIL = os.getenv("MCP_CONTACT_EMAIL", "contact@example.com")
 HEADERS = {
-    "User-Agent": "MCP-Travel-Agent/1.0 (https://github.com/your-repo)",
+    # Provide a contact address so DuckDuckGo can reach out if necessary.
+    # The value can be overridden by setting ``MCP_CONTACT_EMAIL``.
+    "User-Agent": f"MCP-Travel-Agent/1.0 ({CONTACT_EMAIL})",
     "Accept": "application/json",
 }
 
