@@ -67,9 +67,22 @@ curl http://localhost:8000/health/wikipedia
 ### Query Testing
 ```bash
 # Test the full orchestration pipeline
-curl -X POST http://localhost:8000/query 
-  -H "Content-Type: application/json" 
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
   -d '{"query": "Rome"}' | jq
+
+# Example queries to try
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Paris"}' | jq
+
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Tokyo"}' | jq
+
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Berlin"}' | jq
 ```
 
 ### Individual MCP Server Testing
