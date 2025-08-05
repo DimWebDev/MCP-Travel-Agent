@@ -30,9 +30,9 @@ import asyncio
 import time
 import logging
 from typing import Any, Dict, Optional
-
+import os
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 
@@ -192,10 +192,9 @@ async def search_wikipedia(poi_name: str, location_context: Optional[str] = None
         raise RuntimeError(f"No Wikipedia article found for '{poi_name}'")
 
 
-@mcp.tool()
-async def get_wikipedia_info(request: WikipediaRequest) -> WikipediaResponse:
+async def _get_wikipedia_info_impl(request: WikipediaRequest) -> WikipediaResponse:
     """
-    Fetch Wikipedia content for a POI with optional location context.
+    Implementation of Wikipedia content fetching with optional location context.
     
     WORKFLOW:
     ---------
@@ -274,11 +273,21 @@ async def get_wikipedia_info(request: WikipediaRequest) -> WikipediaResponse:
         raise RuntimeError("Invalid response from Wikipedia API") from exc
 
 
+@mcp.tool()
+async def get_wikipedia_info(request: WikipediaRequest) -> WikipediaResponse:
+    """
+    Fetch Wikipedia content for a POI with optional location context.
+    
+    This is the MCP tool wrapper that delegates to the implementation function.
+    """
+    return await _get_wikipedia_info_impl(request)
+
+
 if __name__ == "__main__":
     """
-    Run the Wikipedia MCP server with streamable HTTP transport.
+    Run the Wikipedia MCP server with HTTP transport.
     
-    The server will start on the default port and be ready to accept
+    The server will start on port 8003 and be ready to accept
     MCP tool calls from the Agent Orchestrator for content enrichment.
     """
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8003)

@@ -9,7 +9,7 @@ ARCHITECTURAL OVERVIEW:
 This server acts as an intelligent data provider in the MCP-orchestrated
 travel agent system. It handles the critical first step of travel planning:
 resolving user-provided location names into precise coordinates that other
-MCP servers can use for POI discovery, Wikipedia lookups, and trivia searches.
+MCP servers can use for POI discovery and Wikipedia lookups.
 
 RATE LIMITING COMPLIANCE:
 -------------------------
@@ -28,9 +28,10 @@ import asyncio
 import time
 import logging
 from typing import Any, List
+import os
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel
 
 
@@ -170,7 +171,6 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
     travel agent system. The returned coordinates are used by:
     - POI Discovery Server for finding nearby attractions
     - Wikipedia Server for location-specific content
-    - Trivia Server for location-relevant facts
     
     Args:
         request: GeocodeRequest containing the location name to resolve
@@ -180,6 +180,17 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
         
     Raises:
         RuntimeError: If geocoding fails due to network, parsing, or data issues
+    """
+    return await _geocode_location_impl(request)
+
+
+async def _geocode_location_impl(request: GeocodeRequest) -> GeocodeResponse:
+    """
+    Internal implementation of geocode_location for unit testing.
+    
+    This function contains the actual geocoding logic and is used by both
+    the MCP tool wrapper and unit tests. The separation allows for proper
+    testing without MCP tool decoration complications.
     """
     # STEP 1: Enforce rate limiting to comply with OSM usage policy
     await rate_limiter.wait()
@@ -222,11 +233,11 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
 
 if __name__ == "__main__":
     """
-    Run the geocoding MCP server with streamable HTTP transport.
+    Run the geocoding MCP server with HTTP transport.
     
-    The server will start on the default port and be ready to accept
-    MCP tool calls from the Agent Orchestrator. Use streamable-http
-    transport for optimal performance and compatibility with the
-    MCP travel agent system architecture.
+    The server will start on port 8001 and be ready to accept MCP tool calls 
+    from the Agent Orchestrator. Use HTTP transport 
+    for optimal performance and compatibility with the MCP 
+    travel agent system architecture.
     """
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8001)

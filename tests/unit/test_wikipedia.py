@@ -5,7 +5,7 @@ import httpx
 import pytest
 
 from app.mcp_servers.wikipedia import server
-from app.mcp_servers.wikipedia.server import WikipediaRequest, WikipediaResponse
+from app.mcp_servers.wikipedia.server import WikipediaRequest, WikipediaResponse, _get_wikipedia_info_impl
 
 
 class MockResponse(httpx.Response):
@@ -35,7 +35,7 @@ async def test_wikipedia_success(monkeypatch):
     monkeypatch.setattr(server, "search_wikipedia", mock_search)
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
-    result = await server.get_wikipedia_info(
+    result = await _get_wikipedia_info_impl(
         WikipediaRequest(poi_name="Eiffel Tower", location_context="Paris")
     )
     
@@ -56,7 +56,7 @@ async def test_wikipedia_not_found(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="No Wikipedia article found"):
-        await server.get_wikipedia_info(WikipediaRequest(poi_name="NonexistentPlace"))
+        await _get_wikipedia_info_impl(WikipediaRequest(poi_name="NonexistentPlace"))
 
 
 @pytest.mark.asyncio
@@ -71,7 +71,7 @@ async def test_wikipedia_timeout(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="timed out"):
-        await server.get_wikipedia_info(WikipediaRequest(poi_name="Test"))
+        await _get_wikipedia_info_impl(WikipediaRequest(poi_name="Test"))
 
 
 @pytest.mark.asyncio
@@ -88,7 +88,7 @@ async def test_wikipedia_http_error(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="Wikipedia API error"):
-        await server.get_wikipedia_info(WikipediaRequest(poi_name="Test"))
+        await _get_wikipedia_info_impl(WikipediaRequest(poi_name="Test"))
 
 
 @pytest.mark.asyncio
@@ -105,4 +105,4 @@ async def test_wikipedia_invalid_json_structure(monkeypatch):
     monkeypatch.setattr(server.rate_limiter, "wait", async_noop)
 
     with pytest.raises(RuntimeError, match="No Wikipedia article found"):
-        await server.get_wikipedia_info(WikipediaRequest(poi_name="InvalidStructure"))
+        await _get_wikipedia_info_impl(WikipediaRequest(poi_name="InvalidStructure"))

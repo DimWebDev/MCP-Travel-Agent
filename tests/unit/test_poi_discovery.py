@@ -5,7 +5,7 @@ import httpx
 import pytest
 
 from app.mcp_servers.poi_discovery import server
-from app.mcp_servers.poi_discovery.server import POISearchRequest, POIResult
+from app.mcp_servers.poi_discovery.server import POISearchRequest, POIResult, _search_pois_impl
 
 
 class MockResponse(httpx.Response):
@@ -33,7 +33,7 @@ async def test_search_success(monkeypatch):
 
     monkeypatch.setattr(server, "fetch_overpass", mock_fetch)
 
-    results = await server.search_pois(POISearchRequest(latitude=1.0, longitude=2.0))
+    results = await _search_pois_impl(POISearchRequest(latitude=1.0, longitude=2.0))
     assert isinstance(results, list)
     assert isinstance(results[0], POIResult)
     assert results[0].name == "Spot"
@@ -47,7 +47,7 @@ async def test_search_http_error(monkeypatch):
     monkeypatch.setattr(server, "fetch_overpass", mock_fetch)
 
     with pytest.raises(RuntimeError, match="POI search failed"):
-        await server.search_pois(POISearchRequest(latitude=0.0, longitude=0.0))
+        await _search_pois_impl(POISearchRequest(latitude=0.0, longitude=0.0))
 
 
 @pytest.mark.asyncio
@@ -62,7 +62,7 @@ async def test_search_invalid_json(monkeypatch):
     monkeypatch.setattr(server, "fetch_overpass", mock_fetch)
 
     with pytest.raises(RuntimeError, match="Invalid response"):
-        await server.search_pois(POISearchRequest(latitude=0.0, longitude=0.0))
+        await _search_pois_impl(POISearchRequest(latitude=0.0, longitude=0.0))
 
 
 @pytest.mark.asyncio
@@ -89,6 +89,6 @@ async def test_ranking(monkeypatch):
 
     monkeypatch.setattr(server, "fetch_overpass", mock_fetch)
 
-    results = await server.search_pois(POISearchRequest(latitude=1.0, longitude=2.0))
+    results = await _search_pois_impl(POISearchRequest(latitude=1.0, longitude=2.0))
     assert results[0].name == "A"
     assert results[1].name == "B"

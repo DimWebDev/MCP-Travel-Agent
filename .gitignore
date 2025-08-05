@@ -38,6 +38,9 @@ htmlcov/
 .cache/
 
 # Build
+ 
+# Project-specific ignores
+.github/workflows/commands/codebase_overview.md
 build/
 dist/
 *.log

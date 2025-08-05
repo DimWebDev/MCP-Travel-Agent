@@ -40,9 +40,10 @@ import time
 import logging
 from math import asin, cos, radians, sin, sqrt
 from typing import Any, Dict, List, Literal
+import os
 
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 
@@ -216,10 +217,9 @@ async def fetch_overpass(query: str) -> httpx.Response:
 
 
 
-@mcp.tool()
-async def search_pois(request: POISearchRequest) -> List[POIResult]:
+async def _search_pois_impl(request: POISearchRequest) -> List[POIResult]:
     """
-    Discover POIs using a two-stage filtering and distance calculation architecture.
+    Implementation of POI discovery using a two-stage filtering and distance calculation architecture.
     
     WORKFLOW EXPLANATION:
     =====================
@@ -316,6 +316,16 @@ async def search_pois(request: POISearchRequest) -> List[POIResult]:
     return results[:20]  # Return top 20 results for optimal performance
 
 
+@mcp.tool()
+async def search_pois(request: POISearchRequest) -> List[POIResult]:
+    """
+    Discover POIs using a two-stage filtering and distance calculation architecture.
+    
+    This is the MCP tool wrapper that delegates to the implementation function.
+    """
+    return await _search_pois_impl(request)
+
+
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="http", host="127.0.0.1", port=8002)
