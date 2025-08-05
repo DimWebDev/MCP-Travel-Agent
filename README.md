@@ -429,9 +429,9 @@ curl http://localhost:8000/health/trivia
 ### Simple location queries (the scope of Task T006)
 
 ```bash
-curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}'
-curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Paris"}'
-curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Tokyo"}'
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Rome"}' | jq
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Paris"}' | jq
+curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Tokyo"}' | jq
 ```
 
 These will test the full orchestration pipeline: geocoding, POI discovery, Wikipedia, and trivia. For best results, use simple location names as queries. Complex travel planning queries will be supported in later tasks with GPT-4o-mini integration.
