@@ -32,12 +32,11 @@ async def test_orchestrator_happy_path():
 
     resp = await orchestrator.handle_query("Rome")
     assert isinstance(resp, AgentResponse)
-    assert poi.last_payload == {"lat": 1.0, "lon": 2.0}
+    assert poi.last_payload == {"latitude": 1.0, "longitude": 2.0}
     assert {r.source for r in resp.results} == {
         "geocoding",
         "poi",
         "wikipedia",
-        "trivia",
     }
 
 
@@ -55,4 +54,4 @@ async def test_orchestrator_geocode_failure():
     sources = {r.source for r in resp.results}
     assert "geocoding" not in sources  # failed geocode skipped
     assert "poi" not in sources  # POI not called due to missing coords
-    assert "wikipedia" in sources and "trivia" in sources
+    assert "wikipedia" in sources
