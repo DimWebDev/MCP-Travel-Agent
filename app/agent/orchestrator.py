@@ -46,9 +46,11 @@ class AgentOrchestrator:
         self.logger.info("handle_query", extra={"query": query})
         results: list[ToolResult] = []
 
+
         parsed = await self.query_parser(query)
         location = parsed.get("location", query)
         category = parsed.get("category", "tourism")
+        print(f"[DEBUG] Extracted category: {category}")
 
         try:
             geocode_data = await asyncio.wait_for(
