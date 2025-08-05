@@ -220,3 +220,6 @@ The agent becomes the intelligent coordinator that manages a distributed travel 
 - **Integration Expansion:** Additional MCP tools for weather, transportation, booking systems
 
 This PRD creates a focused MCP learning environment where an AI agent coordinates a realistic travel planning workflow through intelligent orchestration of distributed MCP tool servers, providing hands-on experience with core MCP communication patterns that transfer to more sophisticated applications.
+
+> **Future Note:**
+> After the MVP and possibly before frontend implementation, consider enabling dynamic tool discovery and selection inside the agent orchestrator. This would allow the agent to adapt its workflow based on available MCP tools, paving the way for more autonomous and flexible orchestration patterns.

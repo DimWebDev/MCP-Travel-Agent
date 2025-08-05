@@ -286,3 +286,6 @@ When new tasks emerge:
 4. **Learning Validation:** Ensure new task aligns with core objectives.
 
 > For requirements, see `PRD.md`. For planning and architecture, see `Planning.md`. For agent workflow, see `AGENTS.md`.
+
+> **Future Note:**
+> After the MVP and possibly before frontend implementation, consider enabling dynamic tool discovery and selection inside the agent orchestrator. This will allow the agent to adapt its workflow based on available MCP tools, supporting more advanced orchestration and autonomy in future phases.
