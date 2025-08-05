@@ -66,6 +66,7 @@ curl http://localhost:8000/health/wikipedia
 
 ### Query Testing
 ```bash
+
 # Test the full orchestration pipeline
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
@@ -83,6 +84,22 @@ curl -X POST http://localhost:8000/query \
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
   -d '{"query": "Berlin"}' | jq
+
+### Advanced Query Examples
+
+These examples demonstrate the agent's ability to parse complex, natural language queries and orchestrate multiple MCP tools:
+
+```bash
+# 1. Find historical sites in Rome (category extraction and POI filtering)
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Show me historical sites in Rome"}' | jq
+
+# 2. Plan a multi-day, multi-category trip (multi-step reasoning and tool selection)
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "Plan a 3-day family trip to Barcelona with activities for kids, historical sightseeing, and recommendations for local food experiences near the city center."}' | jq
+```
 ```
 
 ### Individual MCP Server Testing
