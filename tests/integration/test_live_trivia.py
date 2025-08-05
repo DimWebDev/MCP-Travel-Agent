@@ -54,7 +54,7 @@ async def test_live_get_trivia_inspect():
     """
     End-to-end integration test + inspection for 'get_trivia'.
     """
-    server_url = "http://127.0.0.1:8000/mcp"
+    server_url = "http://127.0.0.1:8004/mcp"
 
     # 1. Establish the streamable-HTTP transport
     async with streamablehttp_client(server_url) as (read, write, _):
@@ -102,7 +102,7 @@ async def test_live_get_trivia_inspect():
     if data is None:
         print("No travel-relevant trivia found for the given topic/context. This is expected if the API returns no suitable fact.")
         # Optionally, assert that the error message is present in the raw content blocks
-        error_msgs = [block.text for block in result.content if hasattr(block, "text") and "Error executing tool" in block.text]
+        error_msgs = [block.text for block in result.content if hasattr(block, "text") and "Error calling tool" in block.text]
         assert error_msgs, "Expected an error message in the content blocks when no trivia is found."
     else:
         assert isinstance(data, dict), "Expected structuredContent to be a dict"

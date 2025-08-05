@@ -56,7 +56,7 @@ async def test_live_search_pois_inspect():
     """
     End-to-end integration test + inspection for 'search_pois'.
     """
-    server_url = "http://127.0.0.1:8000/mcp"
+    server_url = "http://127.0.0.1:8002/mcp"
 
     # 1. Establish the streamable-HTTP transport
     async with streamablehttp_client(server_url) as (read, write, _):
