@@ -134,34 +134,7 @@ poetry run isort .
 
 ---
 
-Happy hacking! 🚀 For detailed implementation steps, see [Tasks.md](Tasks.md).
-
----
-
-## 6 · Troubleshooting
-
-| Symptom                                          | Fix                                                        |
-| ------------------------------------------------ | ---------------------------------------------------------- |
-| **`ModuleNotFoundError`** after `poetry install` | run `poetry env use 3.11 && poetry install`                |
-| **OpenAI auth errors**                           | add a valid key to `.env` (`OPENAI_API_KEY=sk-…`)          |
-| **Ports 8000/6379 busy**                         | change in `docker-compose.yml` or pass `--port` to Uvicorn |
-| **Docker daemon not running**                    | start Docker Desktop / `sudo service docker start`         |
-
----
-
-## 7 · Roadmap (Tasks T002-T007)
-
-1. **T002** – implement Geocoding FastMCP server
-2. **T003** – POI Discovery server
-3. **T004** – Wikipedia summary server
-5. **T006** – complete agent orchestration logic
-6. **T007** – finalise `docker-compose.yml`
-
-See `Tasks.md` for detailed acceptance criteria.
-
----
-
-Happy hacking — and enjoy building your MCP-powered travel companion! 
+Happy hacking! 🚀 For detailed implementation steps, see [Tasks.md](Tasks.md). 
 
 ```
 
