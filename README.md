@@ -63,7 +63,6 @@ This will start:
 - Geocoding Server:      http://127.0.0.1:8001/mcp/
 - POI Discovery Server:  http://127.0.0.1:8002/mcp/
 - Wikipedia Server:      http://127.0.0.1:8003/mcp/
-- Trivia Server:         http://127.0.0.1:8004/mcp/
 
 Press Ctrl+C to stop all servers.
 
@@ -75,14 +74,13 @@ Press Ctrl+C to stop all servers.
 ```
 app/
 ├── agent/                    ← FastAPI orchestrator
-└── mcp_servers/             ← 4 independent FastMCP servers
+└── mcp_servers/             ← 3 independent FastMCP servers
     ├── geocoding/
     ├── poi_discovery/
-    ├── wikipedia/
-    └── trivia/
+    └── wikipedia/
 tests/                        ← Pytest suite
 .env.example
-docker-compose.yml            ← Redis + 4 micro-servers
+docker-compose.yml            ← Redis + 3 micro-servers
 pyproject.toml                ← Poetry dependencies
 README.md                     ← you are here
 ```
@@ -137,7 +135,6 @@ Docker services stay up; restart them only after editing a micro-server.
 1. **T002** – implement Geocoding FastMCP server
 2. **T003** – POI Discovery server
 3. **T004** – Wikipedia summary server
-4. **T005** – Trivia server
 5. **T006** – complete agent orchestration logic
 6. **T007** – finalise `docker-compose.yml`
 
@@ -227,23 +224,6 @@ poetry run fastmcp dev app/mcp_servers/wikipedia/server.py
 
 
 
-**To run with the Trivia server, use these analogous commands:**
-
-In one terminal, start the **Trivia MCP server**:
-
-```bash
-poetry run python app/mcp_servers/trivia/server.py
-```
-
-Leave that running.
-
-In a second terminal, start the Inspector for the Trivia server:
-
-```bash
-poetry run fastmcp dev app/mcp_servers/trivia/server.py
-```
-
----
 
 You’ll see output similar to:
 
@@ -421,9 +401,8 @@ You can verify your MCP agent and all microservices are working with these comma
 
 ```bash
 curl http://localhost:8000/health/geocoding
-curl http://localhost:8000/health/poi  
+curl http://localhost:8000/health/poi
 curl http://localhost:8000/health/wikipedia
-curl http://localhost:8000/health/trivia
 ```
 
 ### Simple location queries (the scope of Task T006)
@@ -434,7 +413,7 @@ curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d 
 curl -X POST http://localhost:8000/query -H "Content-Type: application/json" -d '{"query": "Tokyo"}' | jq
 ```
 
-These will test the full orchestration pipeline: geocoding, POI discovery, Wikipedia, and trivia. For best results, use simple location names as queries. Complex travel planning queries will be supported in later tasks with GPT-4o-mini integration.
+These will test the full orchestration pipeline: geocoding, POI discovery, and Wikipedia. For best results, use simple location names as queries. Complex travel planning queries will be supported in later tasks with GPT-4o-mini integration.
 
 #### For pretty-printed JSON output (recommended for local development):
 

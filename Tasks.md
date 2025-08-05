@@ -59,26 +59,13 @@ For each major feature or milestone, break down the implementation into clear, s
 
 
 
-### Task T005: Create Trivia MCP Server
-
-- [x] Create app/mcp_servers/trivia/server.py with DuckDuckGo API wrapper (PRD#4.4)
-- [x] Implement instant answer extraction and fact discovery logic
-- [x] Add source reliability scoring and content filtering
-- [x] Create TriviaRequest and TriviaResponse Pydantic models
-- [x] Implement context matching for travel-relevant facts
-- [x] Annotate function with `@mcp.tool()` from FastMCP
-- [x] Write unit tests with mocked DuckDuckGo API responses
-- [x] Create Dockerfile and test with sample topic queries
-
-
-
 ### Task T006: Implement Basic FastAPI Agent Orchestrator
 
 > **Dev Note:** During local development, agent orchestration and integration can be tested by running all MCP servers in parallel with `run_all_servers.py`. This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 
  - [ ] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
  - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
-- [ ] Implement MCP client connections to all 4 servers (Planning\#4 architecture)
+ - [ ] Implement MCP client connections to all 3 servers (Planning\#4 architecture)
 - [ ] Create agent request/response models with Pydantic validation
 - [ ] Add health check endpoints for all MCP servers
 - [ ] Configure CORS middleware for React frontend integration (Planning\#3)
@@ -103,7 +90,7 @@ For each major feature or milestone, break down the implementation into clear, s
 
 ### Task T007: Set Up Docker Compose Development Environment
 
-- [ ] Create docker-compose.yml with all 5 services (4 MCP servers + agent)
+- [ ] Create docker-compose.yml with all 4 services (3 MCP servers + agent)
 - [ ] Configure internal networking between containers (Planning\#4)
 - [ ] Add Redis container for caching as specified in Planning\#3(will be implemnted later, not at this stage)
 - [ ] Set up volume mounts for development hot-reload
@@ -117,7 +104,7 @@ For each major feature or milestone, break down the implementation into clear, s
 
 - [ ] Install and configure OpenAI Python library with API key handling
 - [ ] Create GPT-4o-mini client following Planning\#3 specifications
-- [ ] Implement function calling schema for all 4 MCP tools (PRD\#4)
+- [ ] Implement function calling schema for all 3 MCP tools (PRD\#4)
 - [ ] Add conversation context management and memory
 - [ ] Implement token usage monitoring as specified in Planning\#6 risks
 - [ ] Add retry logic with exponential backoff for API failures

@@ -21,9 +21,8 @@ def client(monkeypatch):
     geo = DummyClient({"lat": 1.0, "lon": 2.0})
     poi = DummyClient([{"name": "Test"}])
     wiki = DummyClient({"summary": "info"})
-    trivia = DummyClient({"fact": "fact"})
     orchestrator = AgentOrchestrator(
-        {"geocoding": geo, "poi": poi, "wikipedia": wiki, "trivia": trivia}
+        {"geocoding": geo, "poi": poi, "wikipedia": wiki}
     )
     monkeypatch.setattr(main, "orchestrator", orchestrator)
     return TestClient(main.app)
@@ -34,7 +33,7 @@ def test_query_endpoint(client):
     assert resp.status_code == 200
     body = resp.json()
     assert "results" in body
-    assert len(body["results"]) == 4
+    assert len(body["results"]) == 3
 
 
 def test_health_endpoint(client):
