@@ -10,10 +10,11 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from typing import Dict
+from typing import Awaitable, Callable, Dict
 
 from .clients import MCPClient
-from .models import AgentQuery, AgentResponse, ToolResult
+from .models import AgentResponse, ToolResult
+from .query_parser import parse_user_query
 
 logger = logging.getLogger(__name__)
 
@@ -21,26 +22,37 @@ logger = logging.getLogger(__name__)
 class AgentOrchestrator:
     """Coordinate requests across multiple MCP servers."""
 
-    def __init__(self, clients: Dict[str, MCPClient], timeout: float = 10.0):
+    def __init__(
+        self,
+        clients: Dict[str, MCPClient],
+        timeout: float = 10.0,
+        query_parser: Callable[[str], Awaitable[Dict[str, str]]] = parse_user_query,
+    ):
         self.clients = clients
         self.timeout = timeout
         self.logger = logger
+        self.query_parser = query_parser
 
     async def handle_query(self, query: str) -> AgentResponse:
         """Process a user query by invoking multiple MCP tools.
 
         Workflow:
-            1. Geocode the query to obtain coordinates (PRD.md §4.1)
-            2. Use coordinates to search for POIs (PRD.md §4.2)
-            3. Fetch Wikipedia info (PRD.md §4.3)
+            1. Use GPT-4o-mini to parse the location and category
+            2. Geocode the location to obtain coordinates (PRD.md §4.1)
+            3. Use coordinates and category to search for POIs (PRD.md §4.2)
+            4. Fetch Wikipedia info about the location (PRD.md §4.3)
         """
 
         self.logger.info("handle_query", extra={"query": query})
         results: list[ToolResult] = []
 
+        parsed = await self.query_parser(query)
+        location = parsed.get("location", query)
+        category = parsed.get("category", "tourism")
+
         try:
             geocode_data = await asyncio.wait_for(
-                self.clients["geocoding"].call({"location_name": query}),
+                self.clients["geocoding"].call({"location_name": location}),
                 timeout=self.timeout,
             )
             results.append(ToolResult(source="geocoding", data=geocode_data))
@@ -53,6 +65,7 @@ class AgentOrchestrator:
                 poi_payload = {
                     "latitude": geocode_data["lat"],
                     "longitude": geocode_data["lon"],
+                    "category": category,
                 }
                 poi_data = await asyncio.wait_for(
                     self.clients["poi"].call(poi_payload), timeout=self.timeout
@@ -74,7 +87,7 @@ class AgentOrchestrator:
                 )
 
         await asyncio.gather(
-            call_optional("wikipedia", {"poi_name": query}),
+            call_optional("wikipedia", {"poi_name": location}),
         )
 
         return AgentResponse(results=results)

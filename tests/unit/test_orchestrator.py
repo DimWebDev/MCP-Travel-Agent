@@ -25,13 +25,17 @@ async def test_orchestrator_happy_path():
     geo = DummyClient({"lat": 1.0, "lon": 2.0})
     poi = DummyClient([{"name": "Test"}])
     wiki = DummyClient({"summary": "info"})
+    async def parser(q: str):
+        return {"location": q, "category": "tourism"}
     orchestrator = AgentOrchestrator(
-        {"geocoding": geo, "poi": poi, "wikipedia": wiki}
+        {"geocoding": geo, "poi": poi, "wikipedia": wiki}, query_parser=parser
     )
 
     resp = await orchestrator.handle_query("Rome")
     assert isinstance(resp, AgentResponse)
-    assert poi.last_payload == {"latitude": 1.0, "longitude": 2.0}
+    assert poi.last_payload["latitude"] == 1.0
+    assert poi.last_payload["longitude"] == 2.0
+    assert poi.last_payload["category"] == "tourism"
     assert {r.source for r in resp.results} == {
         "geocoding",
         "poi",
@@ -44,8 +48,10 @@ async def test_orchestrator_geocode_failure():
     geo = DummyClient({}, fail=True)
     poi = DummyClient([])
     wiki = DummyClient({"summary": "info"})
+    async def parser(q: str):
+        return {"location": q, "category": "tourism"}
     orchestrator = AgentOrchestrator(
-        {"geocoding": geo, "poi": poi, "wikipedia": wiki}
+        {"geocoding": geo, "poi": poi, "wikipedia": wiki}, query_parser=parser
     )
 
     resp = await orchestrator.handle_query("Nowhere")
