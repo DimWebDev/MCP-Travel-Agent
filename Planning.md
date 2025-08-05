@@ -36,7 +36,7 @@
 - **LLM Integration:** OpenAI GPT-4o-mini via official `openai` Python library with function calling
 - **MCP Implementation:** Python MCP SDK (`mcp` package) for server creation and client orchestration
 - **Backend Framework:** FastAPI with async support for agent API endpoints and MCP server hosting
-- **HTTP Client:** `httpx` for async external API calls to OSM, Wikipedia, DuckDuckGo
+- **HTTP Client:** `httpx` for async external API calls to OSM and Wikipedia
 - **Data Validation:** Pydantic v2 for request/response models and MCP tool schemas
 - **Environment Management:** Poetry for dependency management and virtual environments
 
@@ -56,7 +56,6 @@
 - **OpenStreetMap Nominatim:** Geocoding and location resolution
 - **Overpass API:** POI discovery and geographic queries
 - **Wikipedia API:** Article content and summaries
-- **DuckDuckGo Instant Answer API:** Trivia and fact discovery
 
 
 ### Development \& Deployment
@@ -108,11 +107,6 @@ MCP Travel Agent System
 │   ├── Wikipedia API Wrapper → PRD: wikipedia_lookup_tool
 │   ├── Content Extraction & Summarization
 │   └── Multi-language Support
-│
-└── Trivia FastMCP Server (Python)
-    ├── DuckDuckGo API Wrapper → PRD: trivia_search_tool
-    ├── Fact Discovery & Context Matching
-    └── Source Reliability Scoring
 ```
 
 
@@ -135,14 +129,14 @@ MCP Travel Agent System
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
                     │              │              │              │
-                    ▼              ▼              ▼              ▼
-            ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-            │  Geocoding   │ │ POI Discovery│ │  Wikipedia   │ │    Trivia    │
-            │FastMCP Server│ │FastMCP Server│ │FastMCP Server│ │FastMCP Server│
-            │              │ │              │ │              │ │              │
-            │ Nominatim    │ │ Overpass API │ │ Wikipedia    │ │ DuckDuckGo   │
-            │ Integration  │ │ Integration  │ │ Integration  │ │ Integration  │
-            └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
+                    ▼              ▼              ▼
+            ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+            │  Geocoding   │ │ POI Discovery│ │  Wikipedia   │
+            │FastMCP Server│ │FastMCP Server│ │FastMCP Server│
+            │              │ │              │ │              │
+            │ Nominatim    │ │ Overpass API │ │ Wikipedia    │
+            │ Integration  │ │ Integration  │ │ Integration  │
+            └──────────────┘ └──────────────┘ └──────────────┘
 ```
 
 
@@ -179,7 +173,6 @@ Streamable HTTP (chunked) / SSE (fallback) → Real-time Frontend Updates
 - **OpenStreetMap Nominatim** — Geocoding and location resolution (1 request/second per IP)
 - **Overpass API** — POI discovery and geographic queries (Reasonable use policy, ~10MB/query limit)
 - **Wikipedia API** — Article content and summaries (5000 requests/hour per IP)
-- **DuckDuckGo Instant Answer API** — Trivia and fact discovery (No official rate limits, respectful usage)
 
 
 ### Key Python Dependencies

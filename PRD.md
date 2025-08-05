@@ -7,7 +7,7 @@ Build an intelligent AI travel agent that uses Model Context Protocol
 **AI Agent:** GPT-4ο-mini via API with function calling
 **MCP Implementation:** Python MCP SDK for tool creation
 **Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
-**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (GPT-4o-mini) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
+**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (GPT-4o-mini) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap and Wikipedia into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
 
 ## 1. Objective and Scope  
 
@@ -23,7 +23,6 @@ Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent to
 - `geocode_tool` - wraps OSM Nominatim for location resolution
 - `poi_search_tool` - wraps Overpass API for point-of-interest discovery
 - `wikipedia_lookup_tool` - wraps Wikipedia APIs for detailed descriptions
-- `trivia_search_tool` - wraps DuckDuckGo API for interesting facts
 
 ## 2. User Stories (Natural Language Interaction)
 
@@ -98,23 +97,6 @@ if __name__ == "__main__":
     mcp.run(transport="streamable-http")
 ```
 
-### 4.4 Trivia Search Tool
-```python
-from mcp.server.fastmcp import FastMCP
-
-mcp = FastMCP("Trivia Server")
-
-@mcp.tool()
-def get_trivia(topic: str, context: str = "") -> dict:
-    """
-    Searches DuckDuckGo for interesting facts and trivia
-    Returns: {'trivia': str, 'source': str}
-    """
-
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
-```
-
 ## 5. Agent Orchestration Architecture
 
 ### 5.1 Agent System Design
@@ -151,7 +133,7 @@ class TravelAgent:
 
 **Agent Reasoning:**
 - *Intent:* Romantic activities, evening timing, Paris location
-- *Tool Strategy:* Geocode Paris → Search romantic venues (restaurants, viewpoints) → Get Wikipedia context for ambiance → Find romantic trivia
+- *Tool Strategy:* Geocode Paris → Search romantic venues (restaurants, viewpoints) → Get Wikipedia context for ambiance
 - *Synthesis:* Combine into evening itinerary with romantic narrative
 
 ## 6. Implementation Milestones

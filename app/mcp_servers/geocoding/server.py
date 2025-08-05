@@ -9,7 +9,7 @@ ARCHITECTURAL OVERVIEW:
 This server acts as an intelligent data provider in the MCP-orchestrated
 travel agent system. It handles the critical first step of travel planning:
 resolving user-provided location names into precise coordinates that other
-MCP servers can use for POI discovery, Wikipedia lookups, and trivia searches.
+MCP servers can use for POI discovery and Wikipedia lookups.
 
 RATE LIMITING COMPLIANCE:
 -------------------------
@@ -171,7 +171,6 @@ async def geocode_location(request: GeocodeRequest) -> GeocodeResponse:
     travel agent system. The returned coordinates are used by:
     - POI Discovery Server for finding nearby attractions
     - Wikipedia Server for location-specific content
-    - Trivia Server for location-relevant facts
     
     Args:
         request: GeocodeRequest containing the location name to resolve

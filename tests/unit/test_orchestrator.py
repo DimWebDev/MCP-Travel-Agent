@@ -25,9 +25,8 @@ async def test_orchestrator_happy_path():
     geo = DummyClient({"lat": 1.0, "lon": 2.0})
     poi = DummyClient([{"name": "Test"}])
     wiki = DummyClient({"summary": "info"})
-    trivia = DummyClient({"fact": "fact"})
     orchestrator = AgentOrchestrator(
-        {"geocoding": geo, "poi": poi, "wikipedia": wiki, "trivia": trivia}
+        {"geocoding": geo, "poi": poi, "wikipedia": wiki}
     )
 
     resp = await orchestrator.handle_query("Rome")
@@ -45,9 +44,8 @@ async def test_orchestrator_geocode_failure():
     geo = DummyClient({}, fail=True)
     poi = DummyClient([])
     wiki = DummyClient({"summary": "info"})
-    trivia = DummyClient({"fact": "fact"})
     orchestrator = AgentOrchestrator(
-        {"geocoding": geo, "poi": poi, "wikipedia": wiki, "trivia": trivia}
+        {"geocoding": geo, "poi": poi, "wikipedia": wiki}
     )
 
     resp = await orchestrator.handle_query("Nowhere")

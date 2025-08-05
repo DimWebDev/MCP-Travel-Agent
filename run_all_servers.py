@@ -4,7 +4,7 @@
 This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 Run all MCP servers in parallel for integration testing.
 
-This script starts all four MCP servers (geocoding, poi_discovery, wikipedia, trivia)
+This script starts all three MCP servers (geocoding, poi_discovery, wikipedia)
 on different ports for testing the full travel agent system.
 
 Usage:
@@ -12,9 +12,8 @@ Usage:
 
 Server Ports:
     - Geocoding: 8001
-    - POI Discovery: 8002  
+    - POI Discovery: 8002
     - Wikipedia: 8003
-    - Trivia: 8004
 """
 
 import subprocess
@@ -36,7 +35,6 @@ def main():
         ("app/mcp_servers/geocoding/server.py", 8001),
         ("app/mcp_servers/poi_discovery/server.py", 8002),
         ("app/mcp_servers/wikipedia/server.py", 8003),
-        ("app/mcp_servers/trivia/server.py", 8004),
     ]
     
     processes = []
