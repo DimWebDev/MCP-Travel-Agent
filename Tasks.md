@@ -63,15 +63,15 @@ For each major feature or milestone, break down the implementation into clear, s
 
 > **Dev Note:** During local development, agent orchestration and integration can be tested by running all MCP servers in parallel with `run_all_servers.py`. This script is for rapid iteration and should be replaced by Docker Compose for full-stack and production testing.
 
- - [ ] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
- - [ ] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
- - [ ] Implement MCP client connections to all 3 servers (Planning\#4 architecture)
-- [ ] Create agent request/response models with Pydantic validation
-- [ ] Add health check endpoints for all MCP servers
-- [ ] Configure CORS middleware for React frontend integration (Planning\#3)
-- [ ] Implement structured logging for agent decisions and tool calls
-- [ ] Add basic error handling and timeout management
-- [ ] Test agent-to-MCP-server communication with sample requests
+ - [x] **CLI-first** The initial entry point should be a REPL or CLI that takes user queries from the terminal, orchestrates calls to MCP tools, and prints results. FastAPI endpoints will be layered in after CLI orchestration is functional.
+ - [x] Add basic HTTP/JSON wrapper in FastAPI so you can later swap in a browser UI
+ - [x] Implement MCP client connections to all 3 servers (Planning#4 architecture)
+ - [x] Create agent request/response models with Pydantic validation
+ - [x] Add health check endpoints for all MCP servers
+ - [x] Configure CORS middleware for React frontend integration (Planning#3)
+ - [x] Implement structured logging for agent decisions and tool calls
+ - [x] Add basic error handling and timeout management
+ - [x] Test agent-to-MCP-server communication with sample requests
 
 ### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
 
