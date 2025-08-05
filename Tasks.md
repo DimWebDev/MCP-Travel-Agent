@@ -91,14 +91,14 @@ For each major feature or milestone, break down the implementation into clear, s
 
 #### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
 
-- **Dependencies:** T002 and T003 completed  
-- Add orchestrator logic so every `search_pois` call uses a sensible `radius` based on:  
-  - Urban vs. rural density  
-  - POI category (e.g., ≤800 m for restaurants, 2 km for attractions)  
-  - User keywords (“nearby”, “around”)  
-- Ensure this defaulting is unit-tested.  
-- Update FastAPI endpoint model to accept an optional `radius`.  
-- Document policy in code comments and OpenAPI schema.  
+- [ ] **Dependencies:** T002 and T003 completed  
+- [ ] Add orchestrator logic so every `search_pois` call uses a sensible `radius` based on:  
+  - [ ] Urban vs. rural density  
+  - [ ] POI category (e.g., ≤800 m for restaurants, 2 km for attractions)  
+  - [ ] User keywords (“nearby”, “around”)  
+- [ ] Ensure this defaulting is unit-tested.  
+- [ ] Update FastAPI endpoint model to accept an optional `radius`.  
+- [ ] Document policy in code comments and OpenAPI schema.  
 
 ---
 
