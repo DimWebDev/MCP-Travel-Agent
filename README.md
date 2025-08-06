@@ -98,7 +98,7 @@ curl -X POST http://localhost:8000/query \
 # 2. Plan a multi-day, multi-category trip (multi-step reasoning and tool selection)
 curl -X POST http://localhost:8000/query \
   -H "Content-Type: application/json" \
-  -d '{"query": "Plan a 3-day family trip to Barcelona with activities for kids, historical sightseeing, and recommendations for local food experiences near the city center."}' | jq
+  -d '{"query": "I want to plan a 3-day family trip to Barcelona with activities for kids, historical sightseeing, and recommendations for local food experiences near the city center."}' | jq
 ```
 ```
 
