@@ -19,6 +19,9 @@
 
 ---
 
+> **Future Note:**
+> After the MVP and possibly before frontend implementation, consider enabling dynamic tool discovery and selection inside the agent orchestrator. This will allow the agent to adapt its workflow based on available MCP tools, supporting more advanced orchestration and autonomy in future phases.
+
 
 **MCP Orchestration vs. Traditional Function Calling**
 

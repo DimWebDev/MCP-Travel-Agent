@@ -91,14 +91,14 @@ For each major feature or milestone, break down the implementation into clear, s
 
 #### Task T006-extra: Intelligent Radius Defaulting (OPTIONAL)
 
-- **Dependencies:** T002 and T003 completed  
-- Add orchestrator logic so every `search_pois` call uses a sensible `radius` based on:  
-  - Urban vs. rural density  
-  - POI category (e.g., ≤800 m for restaurants, 2 km for attractions)  
-  - User keywords (“nearby”, “around”)  
-- Ensure this defaulting is unit-tested.  
-- Update FastAPI endpoint model to accept an optional `radius`.  
-- Document policy in code comments and OpenAPI schema.  
+- [ ] **Dependencies:** T002 and T003 completed  
+- [ ] Add orchestrator logic so every `search_pois` call uses a sensible `radius` based on:  
+  - [ ] Urban vs. rural density  
+  - [ ] POI category (e.g., ≤800 m for restaurants, 2 km for attractions)  
+  - [ ] User keywords (“nearby”, “around”)  
+- [ ] Ensure this defaulting is unit-tested.  
+- [ ] Update FastAPI endpoint model to accept an optional `radius`.  
+- [ ] Document policy in code comments and OpenAPI schema.  
 
 ---
 
@@ -286,3 +286,6 @@ When new tasks emerge:
 4. **Learning Validation:** Ensure new task aligns with core objectives.
 
 > For requirements, see `PRD.md`. For planning and architecture, see `Planning.md`. For agent workflow, see `AGENTS.md`.
+
+> **Future Note:**
+> After the MVP and possibly before frontend implementation, consider enabling dynamic tool discovery and selection inside the agent orchestrator. This will allow the agent to adapt its workflow based on available MCP tools, supporting more advanced orchestration and autonomy in future phases.
