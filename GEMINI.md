@@ -90,6 +90,7 @@ The project uses several external libraries, including:
 *   **Middleware:** FastAPI middleware is used for CORS.
 *   **Configuration Management:** Environment variables are used for configuration.
 
+
 ## 7. Important Documents
 
 For detailed requirements, architecture, and implementation steps, see `PRD.md`, `Planning.md`, and `Tasks.md` and `README.md`.
