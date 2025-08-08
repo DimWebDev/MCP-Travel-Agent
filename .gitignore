@@ -1,3 +1,6 @@
+# Gemini agent configuration and commands
+.gemini/
+.gemini/commands/
 # Python
 __pycache__/
 *.py[cod]
