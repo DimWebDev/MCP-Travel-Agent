@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev, 'feature/**']
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # we only support Python 3.11
+        python-version: [3.11]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry venv
+        id: cache-poetry
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: poetry-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies & project
+        run: |
+          poetry install --no-interaction
+
+      - name: Start Geocoding MCP server
+        id: geocode_server
+        run: |
+          # Launch the geocoding server in background
+          poetry run python app/mcp_servers/geocoding/server.py &
+
+          # FIX: record its PID in GitHub Actions outputs in `name=value` format
+          echo "server_pid=$!" >> $GITHUB_OUTPUT
+
+          # give the server a moment to start up
+          sleep 2
+
+      - name: Run unit tests
+        run: |
+          poetry run pytest tests/unit --maxfail=1 --disable-warnings -q
+
+      # - name: Run integration tests
+      #   # only run if the live-server step succeeded
+      #   if: steps.geocode_server.outcome == 'success'
+      #   run: |
+      #     # Use -s if you want to see the print() inspection output
+      #     poetry run pytest tests/integration/test_live_geocode.py -v
+
+      - name: Stop Geocoding MCP server
+        if: always()
+        run: |
+          # kill the background server using the recorded PID
+          kill ${{ steps.geocode_server.outputs.server_pid }} || true
+
+      - name: Upload coverage
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false

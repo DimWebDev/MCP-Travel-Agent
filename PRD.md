@@ -1,29 +1,45 @@
 # Product Requirements Document: MCP-Orchestrated AI Travel Agent
 
 **Main Takeaway:**  
-Build an intelligent AI travel agent that uses Model Context Protoco**Technical Stack (Minimal Complexity)
+Build an intelligent AI travel agent that uses Model Context Protocol tools to orchestrate travel itinerary generation. An AI agent (GPT-4o-mini) interprets user preferences and synthesizes information from OpenStreetMap and Wikipedia through a structured travel planning workflow using MCP protocol communication. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
 
-**Backend Framework:** FastMCP servers with MCP tool integration
-**AI Agent:** Claude-3.5 or GPT-4 via API with function calling
-**MCP Implementation:** Python MCP SDK for tool creation
-**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
-**Data Storage:** In-memory conversation state (no database required for MVP) tools to orchestrate itinerary generation. An AI agent (Claude/GPT-4) makes contextual decisions about which tools to invoke, how to interpret user preferences, and how to synthesize information from OpenStreetMap, Wikipedia, and DuckDuckGo into personalized travel recommendations. Focus on the 20% of agent orchestration features that deliver 80% of learning value.
+**Backend Framework:** FastMCP servers with MCP tool integration  
+**AI Agent:** GPT-4ο-mini via API with MCP orchestration (not traditional function calling)  
+**MCP Implementation:** Python MCP SDK for tool creation  
+**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)  
+**Data Storage:** In-memory conversation state (no database required for MVP)
 
 ## 1. Objective and Scope  
 
-Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent tool orchestration for travel planning. Unlike traditional web applications with predetermined workflows, this system features an AI agent that makes dynamic decisions about which MCP tools to invoke based on natural language user requests.
+Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent tool orchestration for travel planning. Unlike traditional web applications with hardcoded API calls, this system features an AI agent that coordinates a structured travel planning workflow using MCP protocol communication to independent tool servers.
 
 **Core Learning Objectives:**
-- **Agent Decision Making:** How AI agents choose which tools to use based on context
-- **Multi-Step Reasoning:** How agents chain tool calls together intelligently  
+- **MCP Protocol Communication:** How agents coordinate multiple MCP servers via protocol calls
+- **Multi-Step Workflow Orchestration:** How agents chain tool calls together in logical sequences  
 - **Error Recovery:** How agents handle failed API calls or adapt when tools return poor results
-- **Natural Language Processing:** How agents interpret user intent and generate contextual responses
+- **Intelligent Result Synthesis:** How agents interpret and combine data from multiple sources into coherent responses
 
 **MCP Tools to Build:**
 - `geocode_tool` - wraps OSM Nominatim for location resolution
 - `poi_search_tool` - wraps Overpass API for point-of-interest discovery
 - `wikipedia_lookup_tool` - wraps Wikipedia APIs for detailed descriptions
-- `trivia_search_tool` - wraps DuckDuckGo API for interesting facts
+
+## 1.1 MCP Protocol vs Traditional Function Calling
+
+**Critical Architecture Distinction:** This system uses **MCP (Model Context Protocol)** for distributed tool orchestration, NOT traditional function calling.
+
+**How MCP Works:**
+1. **Protocol Communication:** Tools are executed via MCP protocol calls to independent servers
+2. **Distributed Architecture:** Each tool runs as an independent MCP server process
+3. **Structured Workflows:** The AI agent coordinates tool execution through MCP client calls
+4. **Error Isolation:** Tool failures are isolated to individual MCP servers
+
+**MCP Flow:**
+```
+User Query → AI Analysis → Structured MCP Tool Workflow → Result Synthesis
+```
+
+**Key Advantage:** Unlike traditional function calling where tools are embedded in the application, MCP servers provide distributed, independent tool execution with protocol-based communication.
 
 ## 2. User Stories (Natural Language Interaction)
 
@@ -36,12 +52,12 @@ Deliver a **proof-of-concept MCP agent system** that demonstrates intelligent to
 
 | MCP Orchestration Feature              | Learning Value Delivered                    | Implementation Effort |
 |----------------------------------------|---------------------------------------------|----------------------|
-| 1. Intent Classification & Tool Selection | Core agent decision-making patterns        | Low                  |
-| 2. Contextual Tool Chaining             | Multi-step reasoning and workflow management| Low                  |
-| 3. Dynamic Result Synthesis             | Information fusion and natural language generation | Low           |
-| 4. Graceful Error Handling              | Robust agent behavior under failure conditions | Low              |
-| 5. User Preference Memory               | Context retention across conversations      | Medium               |
-| 6. Tool Result Quality Assessment       | Agent evaluation and filtering capabilities | Medium               |
+| 1. Structured Workflow Coordination    | Core MCP protocol communication patterns   | Low                  |
+| 2. Multi-Server Tool Chaining          | Distributed system orchestration          | Low                  |
+| 3. Intelligent Result Synthesis        | Information fusion and natural language generation | Low           |
+| 4. Graceful Error Handling             | Robust agent behavior under failure conditions | Low              |
+| 5. User Preference Memory              | Context retention across conversations      | Medium               |
+| 6. Response Quality Enhancement        | AI-driven content improvement capabilities  | Medium               |
 
 ## 4. MCP Tool Specifications
 
@@ -98,102 +114,119 @@ if __name__ == "__main__":
     mcp.run(transport="streamable-http")
 ```
 
-### 4.4 Trivia Search Tool
-```python
-from mcp.server.fastmcp import FastMCP
-
-mcp = FastMCP("Trivia Server")
-
-@mcp.tool()
-def get_trivia(topic: str, context: str = "") -> dict:
-    """
-    Searches DuckDuckGo for interesting facts and trivia
-    Returns: {'trivia': str, 'source': str}
-    """
-
-if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
-```
-
 ## 5. Agent Orchestration Architecture
 
 ### 5.1 Agent System Design
-The core system centers around an **AI Agent Controller** that receives natural language requests and orchestrates MCP tool usage:
+The core system centers around an **AI Agent Controller** that receives natural language requests and orchestrates a structured travel planning workflow through MCP protocol communication:
 
 ```python
 class TravelAgent:
-    def __init__(self, llm_client, mcp_tools):
-        self.llm = llm_client  # Claude, GPT-4, etc.
-        self.tools = mcp_tools
+    def __init__(self, llm_client, mcp_clients):
+        self.llm = llm_client  # GPT-4o-mini for analysis and synthesis
+        self.mcp_clients = mcp_clients  # MCP client connections to tool servers
         self.conversation_memory = []
     
     async def process_request(self, user_request: str) -> str:
-        # Agent analyzes request and decides tool usage strategy
-        response = await self.llm.generate(
-            system_prompt=TRAVEL_AGENT_PROMPT,
-            user_input=user_request,
-            tools=self.tools,
-            conversation_history=self.conversation_memory
+        # AI agent analyzes user intent and location
+        intent_analysis = await self.llm.analyze_intent(user_request)
+        
+        # Execute structured travel planning workflow via MCP protocol
+        workflow_results = await self.execute_travel_workflow(
+            intent_analysis.location, 
+            intent_analysis.preferences
         )
-        return response
+        
+        # AI synthesizes results into personalized response
+        return await self.llm.synthesize_response(
+            workflow_results, 
+            intent_analysis, 
+            user_request
+        )
+    
+    async def execute_travel_workflow(self, location, preferences):
+        # Structured workflow: Geocode → POI Search → Wikipedia Enrichment
+        coords = await self.mcp_clients.geocoding.call({"location_name": location})
+        pois = await self.mcp_clients.poi.call({
+            "latitude": coords["lat"], 
+            "longitude": coords["lon"],
+            "category": preferences.category
+        })
+        context = await self.mcp_clients.wikipedia.call({"poi_name": location})
+        
+        return {"coords": coords, "pois": pois, "context": context}
 ```
 
 ### 5.2 Agent Decision Flow
-1. **Intent Analysis:** Agent interprets user preferences (history, food, family, budget, etc.)
-2. **Tool Selection:** Agent decides which tools to invoke and in what sequence
-3. **Contextual Execution:** Agent calls tools with parameters informed by user context
-4. **Quality Assessment:** Agent evaluates tool results and decides whether to refine searches
-5. **Synthesis:** Agent combines information into personalized, coherent recommendations
-6. **Memory Update:** Agent retains context for follow-up questions
+1. **Intent Analysis:** AI agent interprets user preferences (history, food, family, budget, etc.) and extracts location
+2. **Workflow Coordination:** Agent executes structured travel planning workflow via MCP protocol calls
+3. **Location Resolution:** Agent calls geocoding MCP server to resolve location to coordinates
+4. **POI Discovery:** Agent calls POI MCP server with coordinates and preference-based categories
+5. **Context Enrichment:** Agent calls Wikipedia MCP server to add contextual information
+6. **Result Synthesis:** Agent combines MCP tool results into personalized, coherent recommendations
+7. **Memory Update:** Agent retains context for follow-up questions
 
 ### 5.3 Example Agent Reasoning Process
 **User:** "Plan a romantic evening in Paris"
 
-**Agent Reasoning:**
-- *Intent:* Romantic activities, evening timing, Paris location
-- *Tool Strategy:* Geocode Paris → Search romantic venues (restaurants, viewpoints) → Get Wikipedia context for ambiance → Find romantic trivia
-- *Synthesis:* Combine into evening itinerary with romantic narrative
+**Agent Workflow:**
+- *Intent Analysis:* Extract location "Paris" and preferences "romantic activities, evening timing"
+- *MCP Workflow Execution:* 
+  1. Call geocoding MCP server to resolve "Paris" coordinates
+  2. Call POI MCP server with coordinates and "restaurant" + "tourism" categories for romantic venues
+  3. Call Wikipedia MCP server to enrich venues with romantic context and ambiance information
+- *Result Synthesis:* AI combines MCP tool outputs into evening itinerary with romantic narrative
 
 ## 6. Implementation Milestones
 
 | Sprint | MCP Orchestration Goals                                    | Duration |
 |--------|------------------------------------------------------------|----------|
-| 1      | Build MCP tool wrappers; basic agent-tool communication   | 1 week   |
-| 2      | Implement agent decision-making for tool selection        | 1 week   |
-| 3      | Add contextual tool chaining and result synthesis         | 1 week   |
+| 1      | Build MCP tool servers; basic agent-tool communication    | 1 week   |
+| 2      | Implement structured workflow orchestration                | 1 week   |
+| 3      | Add AI-driven intent analysis and result synthesis        | 1 week   |
 | 4      | Implement error handling and graceful degradation         | 1 week   |
-| 5      | Add conversation memory and follow-up question handling   | 1 week   |
+| 5      | Add conversation memory and response enhancement           | 1 week   |
 
 ## 7. Success Metrics for MCP Learning
 
-- **Agent Autonomy:** Agent successfully selects appropriate tools without hardcoded workflows in ≥90% of test cases
-- **Contextual Adaptation:** Agent modifies tool usage based on user preferences (e.g., "historical" vs "family-friendly") in ≥80% of requests  
-- **Error Recovery:** Agent gracefully handles tool failures and finds alternative information sources in ≥75% of error scenarios
-- **Synthesis Quality:** Agent-generated responses demonstrate meaningful information fusion rather than simple concatenation
+- **MCP Protocol Mastery:** Agent successfully coordinates all MCP servers via protocol communication in ≥95% of requests
+- **Workflow Reliability:** Structured travel planning workflow completes successfully in ≥90% of test cases  
+- **Error Recovery:** Agent gracefully handles individual MCP server failures and provides partial results in ≥75% of error scenarios
+- **Synthesis Quality:** AI-generated responses demonstrate meaningful information fusion rather than simple concatenation
 - **Learning Demonstration:** Clear evidence of MCP orchestration patterns in code architecture and agent behavior
 
 ## 8. Technical Stack (Minimal Complexity)
 
-**Backend Framework:** FastAPI with MCP tool integration
-**AI Agent:** Claude-3.5 or GPT-4 via API with function calling
-**MCP Implementation:** Python MCP SDK for tool creation
-**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)
+**Backend Framework:** FastAPI with MCP tool integration  
+**AI Agent:** GPT-4o-mini via API for intent analysis and result synthesis  
+**MCP Implementation:** Python MCP SDK for tool creation  
+**MCP Protocol:** Distributed tool coordination via client-server communication  
+**Frontend:** Simple HTML/JavaScript for agent chat interface (no complex mapping initially)  
 **Data Storage:** In-memory conversation state (no database required for MVP)
 
 ## 9. Key Differentiators from Traditional PRD
 
 This MCP-based approach fundamentally differs from traditional web applications:
 
-**Traditional Approach:** User input → Predetermined API sequence → Fixed response format
-**MCP Orchestration:** User input → Agent analysis → Dynamic tool selection → Contextual synthesis → Personalized response
+**Traditional Function Calling:** User input → Embedded API calls → Fixed response format  
+**MCP Orchestration:** User input → AI intent analysis → Structured MCP workflow → Protocol-based tool coordination → AI synthesis → Personalized response
 
-The agent becomes the intelligent orchestrator that makes contextual decisions, handles uncertainty, and provides natural language interaction. This design prioritizes learning agent orchestration patterns over building a polished travel application.
+The agent becomes the intelligent coordinator that manages a distributed travel planning workflow through MCP protocol communication, demonstrating how AI can orchestrate multiple independent services to achieve complex domain-specific goals.
 
 ## 10. Future MCP Enhancements (Beyond 80/20)
 
-- **Multi-Agent Orchestration:** Specialized agents for different travel domains (food, culture, adventure)
-- **Tool Learning:** Agents that improve tool selection based on user feedback
-- **Complex Workflow Management:** Multi-day itinerary planning with dependency management
+- **Adaptive Workflows:** Modify tool execution order based on user preferences and context
+- **Advanced Synthesis:** More sophisticated AI-driven content generation and personalization
+- **Complex Error Recovery:** Intelligent fallback strategies and alternative tool usage
 - **Integration Expansion:** Additional MCP tools for weather, transportation, booking systems
 
-This PRD transforms the original deterministic web application into a genuine MCP learning environment where an AI agent orchestrates tool usage through intelligent decision-making, providing hands-on experience with the core patterns of agent orchestration that transfer to more sophisticated MCP applications.
+
+This PRD creates a focused MCP learning environment where an AI agent coordinates a realistic travel planning workflow through intelligent orchestration of distributed MCP tool servers, providing hands-on experience with core MCP communication patterns that transfer to more sophisticated applications.
+
+---
+
+# Future Feature
+
+A weather MCP server could be added in the future to provide real-time weather data for travel destinations, further enhancing the agent's recommendations and itinerary planning.
+
+> **Future Note:**
+> After the MVP and possibly before frontend implementation, consider enabling dynamic tool discovery and selection inside the agent orchestrator. This would allow the agent to adapt its workflow based on available MCP tools, paving the way for more autonomous and flexible orchestration patterns.

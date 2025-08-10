@@ -14,14 +14,14 @@
 1. **Review project documentation** before starting work (PRD.md, Planning.md, Tasks.md)
 2. **Make focused changes** — one feature or fix per pull request with tests and documentation
 3. **Never commit secrets** — use environment variables for API keys and credentials
-4. **Document your reasoning** — explain complex logic and design decisions
+4. **Document your reasoning** — explain complex logic and design decisions, in the form of very clear comments inside of of the code.
 5. **Ask for clarification** when requirements or architecture are unclear
 
 > **Principle:** Write clear, self-documenting code that demonstrates MCP orchestration patterns.
 
 ## 2. Responsibilities
 
-- **Code Quality:** Write clean, well-documented code with descriptive names and comprehensive tests
+- **Code Quality:** Write clean, well-documented code with descriptive names, very clear comments and comprehensive tests
 - **Documentation:** Update relevant docs when making changes to maintain consistency
 - **Testing:** Ensure high test coverage and validate agent decision-making behavior
 - **Collaboration:** Communicate progress, blockers, and discoveries with the team
