@@ -8,6 +8,7 @@ MCP Python SDK.md
 # Gemini agent configuration and commands
 .gemini/
 .gemini/commands/
+.github/commands/
 # Python
 __pycache__/
 *.py[cod]
@@ -45,6 +46,7 @@ Thumbs.db
 htmlcov/
 .coverage
 .cache/
+.pytest_cache/
 
 # Build
  
