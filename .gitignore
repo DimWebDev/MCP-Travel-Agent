@@ -3,6 +3,7 @@ Planning.md
 PRD.md
 AGENTS.md
 GEMINI.md
+Tasks.md
 
 # Gemini agent configuration and commands
 .gemini/
@@ -49,6 +50,7 @@ htmlcov/
  
 # Project-specific ignores
 .github/workflows/commands/codebase_overview.md
+.github/copilot-instructions.md
 build/
 dist/
 *.log
